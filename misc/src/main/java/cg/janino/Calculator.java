@@ -42,15 +42,6 @@ public class Calculator
   }
   /**************************************************/
   
-  public static Map<Class, Adder> typeToAdder = Maps.newHashMap();
-  static
-  {
-    typeToAdder.put(Short.class, new Adder.ShortAdder());
-    typeToAdder.put(Integer.class, new Adder.IntegerAdder());
-    typeToAdder.put(Float.class, new Adder.FloatAdder());
-    typeToAdder.put(Double.class, new Adder.DoubleAdder());
-  }
-  
   public static class ClassPair
   {
     @Override
@@ -96,6 +87,16 @@ public class Calculator
     }
   }
   
+
+  public static Map<Class, AddTo> sameTypeToAdder = Maps.newHashMap();
+  static
+  {
+    sameTypeToAdder.put(Integer.class, new AddTo.IntegerAddToInteger());
+    sameTypeToAdder.put(Float.class, new AddTo.FloatAddToFloat());
+    sameTypeToAdder.put(Double.class, new AddTo.DoubleAddToDouble());
+  }
+  
+  
   //(AddenType, ResultType) ==> class
   public static Map<ClassPair, AddTo> typePairToAddTo = Maps.newHashMap();
   static
@@ -118,7 +119,7 @@ public class Calculator
   
   public static <T extends Number> T add(Class<T> type, T value1, T value2)
   {
-    return (T)typeToAdder.get(type).add(value1, value2);
+    return (T)sameTypeToAdder.get(type).addTo(value1, value2);
   }
   
   public static <T extends Number, R extends Number> R addTo(Class<R> resultType, R orgValue, Class<T> type, T value)
