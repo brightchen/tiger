@@ -54,7 +54,10 @@ public class Calculator
   public static Map<Class, AddTo> sameTypeToAdder = Maps.newHashMap();
 
   static {
+    sameTypeToAdder.put(Byte.class, new AddTo.ByteAddToByte());
+    sameTypeToAdder.put(Short.class, new AddTo.ShortAddToShort());
     sameTypeToAdder.put(Integer.class, new AddTo.IntegerAddToInteger());
+    sameTypeToAdder.put(Long.class, new AddTo.LongAddToLong());
     sameTypeToAdder.put(Float.class, new AddTo.FloatAddToFloat());
     sameTypeToAdder.put(Double.class, new AddTo.DoubleAddToDouble());
   }
@@ -112,6 +115,9 @@ public class Calculator
 
   public static <T extends Number, R extends Number> R addTo(Class<R> resultType, R orgValue, Class<T> type, T value)
   {
-    return (R)typePairToAddTo.get(new ClassPair(type, resultType)).addTo(orgValue, value);
+    AddTo addTo = typePairToAddTo.get(new ClassPair(type, resultType));
+    if(addTo == null)
+      throw new UnsupportedOperationException("Not Support add " + type + " to " + resultType);
+    return (R)addTo.addTo(orgValue, value);
   }
 }

@@ -60,7 +60,29 @@ public interface AddTo<R, T>
     }
   }
   
+  public static class ShortAddToShort implements AddTo<Short,Short>
+  {
+    public Short addTo(Short orgValue, Short value)
+    {
+      return (short)(orgValue + value);
+    }
+  }
   
+  public static class ByteAddToShort implements AddTo<Short,Byte>
+  {
+    public Short addTo(Short orgValue, Byte value)
+    {
+      return (short)(orgValue + value);
+    }
+  }
+  
+  public static class ByteAddToByte implements AddTo<Byte,Byte>
+  {
+    public Byte addTo(Byte orgValue, Byte value)
+    {
+      return (byte)(orgValue + value);
+    }
+  }
   public static class FloatAddToFloat implements AddTo<Float,Float>
   {
     public Float addTo(Float orgValue, Float value)
