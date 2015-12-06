@@ -91,7 +91,7 @@ public class Calculator
   public static Map<Class, AddTo> sameTypeToAdder = Maps.newHashMap();
   static
   {
-    sameTypeToAdder.put(Integer.class, new AddTo.IntegerAddToInteger());
+    //sameTypeToAdder.put(Integer.class, new AddTo.IntegerAddToInteger());
     sameTypeToAdder.put(Float.class, new AddTo.FloatAddToFloat());
     sameTypeToAdder.put(Double.class, new AddTo.DoubleAddToDouble());
   }
