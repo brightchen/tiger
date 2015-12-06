@@ -1,0 +1,8 @@
+cg/nio/ServerSocketChannel$1.class
+cg/nio/ServerSocketChannel.class
+cg/misc/MultiLine.class
+cg/test/TestTuple1.class
+cg/hbase/HbaseClientUtil.class
+cg/memory/Manager.class
+cg/test/TupleGenerator.class
+cg/test/RandomStringGenerator.class

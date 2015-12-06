@@ -1,0 +1,5 @@
+cg/hive/client/HiveQueryTester.class
+cg/query/QueryTester$1.class
+cg/query/QueryTester.class
+cg/query/NetPackage.class
+cg/nio/ServerSocketChannelTester.class
