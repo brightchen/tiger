@@ -10,6 +10,7 @@ import com.google.common.collect.Sets;
 
 import cg.dimension.model.aggregate.Aggregate;
 import cg.dimension.model.aggregate.AggregateType;
+import cg.dimension.model.aggregate.IncrementalAggregateSum;
 import cg.dimension.model.aggregate.IncrementalAggregateSumDouble;
 import cg.dimension.model.aggregate.IncrementalAggregateSumLong;
 import cg.dimension.model.criteria.PropertyCriteria;
@@ -97,10 +98,7 @@ public class DimensionComputation<T>
     switch(aggregateType)
     {
       case SUM:
-        if(aggregateValueType.equals(Integer.class) || aggregateValueType.equals(Long.class) || aggregateValueType.equals(Short.class))
-          return new IncrementalAggregateSumLong();
-        if(aggregateValueType.equals(Double.class) || aggregateValueType.equals(Float.class))
-          return new IncrementalAggregateSumDouble();
+        return new IncrementalAggregateSum(aggregateValueType);
     }
     throw new IllegalArgumentException("Unsupported.");
   }

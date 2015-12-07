@@ -52,7 +52,6 @@ public class Calculator
   }
 
   public static Map<Class, AddTo> sameTypeToAdder = Maps.newHashMap();
-
   static {
     sameTypeToAdder.put(Byte.class, new AddTo.ByteAddToByte());
     sameTypeToAdder.put(Short.class, new AddTo.ShortAddToShort());
@@ -108,16 +107,31 @@ public class Calculator
     }
   }
 
-  public static <T extends Number> T add(Class<T> type, T value1, T value2)
+  public static <T extends Number> T add(T value1, T value2)
   {
-    return (T)sameTypeToAdder.get(type).addTo(value1, value2);
+    return (T)sameTypeToAdder.get(value1.getClass()).addTo(value1, value2);
   }
 
-  public static <T extends Number, R extends Number> R addTo(Class<R> resultType, R orgValue, Class<T> type, T value)
+  public static <T extends Number, R extends Number> R addTo(R orgValue, T value)
   {
-    AddTo addTo = typePairToAddTo.get(new ClassPair(type, resultType));
+    AddTo addTo = typePairToAddTo.get(new ClassPair(value.getClass(), orgValue.getClass()));
     if(addTo == null)
-      throw new UnsupportedOperationException("Not Support add " + type + " to " + resultType);
+      throw new UnsupportedOperationException("Not Support add " + value.getClass() + " to " + orgValue.getClass());
     return (R)addTo.addTo(orgValue, value);
+  }
+  
+  
+  public static Map<Class, ValueSetter> typeToValueSetter = Maps.newHashMap();
+  static {
+    typeToValueSetter.put(Byte.class, new ValueSetter.ByteSetter());
+    typeToValueSetter.put(Short.class, new ValueSetter.ShortSetter());
+    typeToValueSetter.put(Integer.class, new ValueSetter.IntegerSetter());
+    typeToValueSetter.put(Long.class, new ValueSetter.LongSetter());
+    typeToValueSetter.put(Float.class, new ValueSetter.FloatSetter());
+    typeToValueSetter.put(Double.class, new ValueSetter.DoubleSetter());
+  }
+  public static <T extends Number> T setValue(Class<T> type, double value)
+  {
+    return (T)typeToValueSetter.get(type).setValue(value);
   }
 }
