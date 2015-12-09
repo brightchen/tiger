@@ -12,9 +12,9 @@ import cg.dimension.ReflectionUtil;
  *
  * @param <B>
  */
-public class BeanPropertyValueGenerator<B>
+public class BeanPropertyValueGenerator<B, V>
 {
-  protected Getter<Object, Object> getter;
+  protected Getter<B, V> getter;
   
   /**
    * this construct use the property type as the value type
@@ -38,7 +38,7 @@ public class BeanPropertyValueGenerator<B>
     getter = PojoUtils.createGetter(beanClass, propertyInfo.getPropertyExpression(), propertyInfo.getType().getJavaType());
   }
   
-  public Object getPropertyValue(B bean)
+  public V getPropertyValue(B bean)
   {
     return getter.get(bean);
   }

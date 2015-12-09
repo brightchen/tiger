@@ -5,21 +5,28 @@ import cg.dimension.model.criteria.PropertyCriteria;
 import cg.dimension.model.property.BeanPropertyValueGenerator;
 
 @SuppressWarnings("rawtypes")
-public class SimpleAggregator<T> implements Aggregator<T, Object>
+public class SimpleAggregator<T> implements Aggregator<T, Number>
 {
   protected String name;
   protected PropertyCriteria criteria;
   protected BeanPropertyValueGenerator valueGenerator;    //related to a property (bean/property)
-  protected Aggregate aggregate;
+  protected Aggregate<Number> aggregate;
+  
+  public SimpleAggregator(){}
   
   public SimpleAggregator(String name, PropertyCriteria criteria, BeanPropertyValueGenerator valueGenerator, Aggregate aggregate)
+  {
+    init(name, criteria, valueGenerator, aggregate);
+  }
+
+  public void init(String name, PropertyCriteria criteria, BeanPropertyValueGenerator valueGenerator, Aggregate aggregate)
   {
     this.name = name;
     this.setCriteria(criteria);
     this.setValueGenerator(valueGenerator);
     this.setAggregate(aggregate);
   }
-
+  
   /**
    * this assume the value already match the criteria.
    * So the value will not be checked.
@@ -27,7 +34,7 @@ public class SimpleAggregator<T> implements Aggregator<T, Object>
    * @param value
    */
   @Override
-  public void processMatchedValue(Object value)
+  public void processMatchedValue(Number value)
   {
     aggregate.addValue(value);
   }
@@ -37,20 +44,13 @@ public class SimpleAggregator<T> implements Aggregator<T, Object>
   {
     if(!criteria.matches(bean))
       return;
-    Object value = valueGenerator.getPropertyValue(bean);
+    Number value = (Number)valueGenerator.getPropertyValue(bean);
     aggregate.addValue(value);
   }
   
 
   @Override
-  public void addValue(Object value)
-  {
-    aggregate.addValue(value);    
-  }
-  
-  
-  @Override
-  public Object getValue()
+  public Number getValue()
   {
     return aggregate.getValue();
   }
@@ -86,10 +86,16 @@ public class SimpleAggregator<T> implements Aggregator<T, Object>
   }
 
   @Override
-  public boolean matches(Object value)
+  public boolean matches(Number value)
+  {
+    return criteria.matches(value);
+  }
+
+  @Override
+  public void addValue(Number value)
   {
     // TODO Auto-generated method stub
-    return false;
+    
   }
 
   

@@ -6,6 +6,13 @@ public class RangeMatcher<V> implements Matcher<V>
 {
   protected Range<V> range;
   
+  public RangeMatcher(){}
+  
+  public RangeMatcher(Range<V> range)
+  {
+    this.setRange(range);
+  }
+  
   //@Override
   public boolean matches(V value)
   {

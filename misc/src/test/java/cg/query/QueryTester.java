@@ -3,6 +3,11 @@ package cg.query;
 import java.io.IOException;
 import java.util.Calendar;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
@@ -10,13 +15,8 @@ import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.security.UserGroupInformation;
-import org.junit.Before;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import cg.hbase.HbaseClientUtil;
-import cg.test.TestTuple1;
+//import cg.hbase.HbaseClientUtil;
 
 public class QueryTester {
   private static final Logger logger = LoggerFactory.getLogger(QueryTester.class);
@@ -44,45 +44,45 @@ public class QueryTester {
   {
     connect();
     
-    HBaseAdmin admin = HbaseClientUtil.createAdmin(conf);
-    boolean createTable = false;
-    if(admin.isTableAvailable(tableName))
-    {
-      if(cleanTable)
-      {
-        HbaseClientUtil.deleteTable(admin, tableName);
-        createTable = true;
-      }
-    }
-    else
-      createTable = true;
-    
-    if(createTable)
-      HbaseClientUtil.createTable(admin, tableName, TestTuple1.getFieldName());
-    
-    table = new HTable(conf, tableName);
-    table.setAutoFlushTo(false);
-    
-    logger.info("Start to write data.");
-    long startTime = Calendar.getInstance().getTimeInMillis();
-
-    for( int i = 0; i < rowSize; ++i )
-    {
-      TestTuple1 tuple = TestTuple1.createRandomly(i);
-      Put put = new Put(Bytes.toBytes(tuple.getRow()));
-      put.add(Bytes.toBytes("name"), Bytes.toBytes("name"), Bytes.toBytes(tuple.getName()));
-      put.add(Bytes.toBytes("age"), Bytes.toBytes("age"), Bytes.toBytes(tuple.getAge()));
-      put.add(Bytes.toBytes("address"), Bytes.toBytes("address"), Bytes.toBytes(tuple.getAddress()));
-      put.add(Bytes.toBytes("desc"), Bytes.toBytes("desc"), Bytes.toBytes(tuple.getDesc()));
-      table.put(put);
-      
-      if(i>0 && i%1000==0)
-        table.flushCommits();
-    }
-    table.flushCommits();
-    
-    long spentTime = Calendar.getInstance().getTimeInMillis() - startTime;
-    logger.info("Spent {} milli-second to write {} rows.", spentTime, rowSize);
+//    HBaseAdmin admin = HbaseClientUtil.createAdmin(conf);
+//    boolean createTable = false;
+//    if(admin.isTableAvailable(tableName))
+//    {
+//      if(cleanTable)
+//      {
+//        HbaseClientUtil.deleteTable(admin, tableName);
+//        createTable = true;
+//      }
+//    }
+//    else
+//      createTable = true;
+//    
+//    if(createTable)
+//      HbaseClientUtil.createTable(admin, tableName, TestTuple1.getFieldName());
+//    
+//    table = new HTable(conf, tableName);
+//    table.setAutoFlushTo(false);
+//    
+//    logger.info("Start to write data.");
+//    long startTime = Calendar.getInstance().getTimeInMillis();
+//
+//    for( int i = 0; i < rowSize; ++i )
+//    {
+//      TestTuple1 tuple = TestTuple1.createRandomly(i);
+//      Put put = new Put(Bytes.toBytes(tuple.getRow()));
+//      put.add(Bytes.toBytes("name"), Bytes.toBytes("name"), Bytes.toBytes(tuple.getName()));
+//      put.add(Bytes.toBytes("age"), Bytes.toBytes("age"), Bytes.toBytes(tuple.getAge()));
+//      put.add(Bytes.toBytes("address"), Bytes.toBytes("address"), Bytes.toBytes(tuple.getAddress()));
+//      put.add(Bytes.toBytes("desc"), Bytes.toBytes("desc"), Bytes.toBytes(tuple.getDesc()));
+//      table.put(put);
+//      
+//      if(i>0 && i%1000==0)
+//        table.flushCommits();
+//    }
+//    table.flushCommits();
+//    
+//    long spentTime = Calendar.getInstance().getTimeInMillis() - startTime;
+//    logger.info("Spent {} milli-second to write {} rows.", spentTime, rowSize);
   }
   
   protected void connect() throws IOException {

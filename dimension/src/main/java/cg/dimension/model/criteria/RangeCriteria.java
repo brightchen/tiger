@@ -6,6 +6,13 @@ public class RangeCriteria<T> //implements Criteria<T>
 {
   protected Range<T> range;
   
+  public RangeCriteria(){}
+  
+  public RangeCriteria(Range<T> range)
+  {
+    this.setRange(range);
+  }
+  
   //@Override
   public boolean matches(T value)
   {

@@ -1,18 +1,14 @@
 package cg.dimension.compute;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import cg.dimension.model.aggregate.Aggregate;
 import cg.dimension.model.aggregate.AggregateType;
 import cg.dimension.model.aggregate.IncrementalAggregateSum;
-import cg.dimension.model.aggregate.IncrementalAggregateSumDouble;
-import cg.dimension.model.aggregate.IncrementalAggregateSumLong;
 import cg.dimension.model.criteria.PropertyCriteria;
 import cg.dimension.model.property.BeanPropertyValueGenerator;
 
