@@ -14,7 +14,7 @@ import cg.dimension.model.property.BeanPropertyValueGenerator;
  * @param <B>
  * @param <V>
  */
-public abstract class AbstractTimeSlideBucketAggregator<B, V extends Number> extends CompositeAggregator<B, V>
+public abstract class AbstractTimeSlideAggregator<B, V extends Number> extends CompositeAggregator<B, V>
 {
   public static enum TimeBaseType
   {
@@ -22,6 +22,7 @@ public abstract class AbstractTimeSlideBucketAggregator<B, V extends Number> ext
     SpecificTime
   }
   
+  protected String name;
   protected long slideStep;     //for example 1 second
   protected long timePeriod;    //for example 1 hour
   protected TimeBaseType timeBaseType;
@@ -33,16 +34,16 @@ public abstract class AbstractTimeSlideBucketAggregator<B, V extends Number> ext
    */
   protected boolean alignTime = true;  
   
-  public AbstractTimeSlideBucketAggregator(){}
+  public AbstractTimeSlideAggregator(){}
   
   //slide base on current time
-  public AbstractTimeSlideBucketAggregator(long timePeriod, long slideStep)
+  public AbstractTimeSlideAggregator(long timePeriod, long slideStep)
   {
     init(timePeriod, slideStep);
   }
   
   //slide base on specific time
-  public AbstractTimeSlideBucketAggregator(long timePeriod, long slideStep, long baseTime)
+  public AbstractTimeSlideAggregator(long timePeriod, long slideStep, long baseTime)
   {
     init(timePeriod, slideStep, baseTime);
   }
@@ -79,7 +80,7 @@ public abstract class AbstractTimeSlideBucketAggregator<B, V extends Number> ext
     subAggregators = Lists.newArrayListWithCapacity(aggregatorNum);
     for(int index=0; index<aggregatorNum; ++index)
     {
-      subAggregators.add(createSubAggregator(bucketBeginTime, bucketTimeSpan));
+      subAggregators.add(createSubAggregator(bucketBeginTime, bucketTimeSpan, index));
       bucketBeginTime += bucketTimeSpan;
     }
     
@@ -101,5 +102,67 @@ public abstract class AbstractTimeSlideBucketAggregator<B, V extends Number> ext
     }
   }
   
-  protected abstract Aggregator createSubAggregator(long bucketBeginTime, long bucketTimeSpan);
+  protected abstract Aggregator createSubAggregator(long bucketBeginTime, long bucketTimeSpan, int index);
+
+  public String getName()
+  {
+    return name;
+  }
+
+  public void setName(String name)
+  {
+    this.name = name;
+  }
+
+  public long getSlideStep()
+  {
+    return slideStep;
+  }
+
+  public void setSlideStep(long slideStep)
+  {
+    this.slideStep = slideStep;
+  }
+
+  public long getTimePeriod()
+  {
+    return timePeriod;
+  }
+
+  public void setTimePeriod(long timePeriod)
+  {
+    this.timePeriod = timePeriod;
+  }
+
+  public TimeBaseType getTimeBaseType()
+  {
+    return timeBaseType;
+  }
+
+  public void setTimeBaseType(TimeBaseType timeBaseType)
+  {
+    this.timeBaseType = timeBaseType;
+  }
+
+  public long getBaseTime()
+  {
+    return baseTime;
+  }
+
+  public void setBaseTime(long baseTime)
+  {
+    this.baseTime = baseTime;
+  }
+
+  public boolean isAlignTime()
+  {
+    return alignTime;
+  }
+
+  public void setAlignTime(boolean alignTime)
+  {
+    this.alignTime = alignTime;
+  }
+  
+  
 }

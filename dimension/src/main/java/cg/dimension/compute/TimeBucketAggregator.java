@@ -7,12 +7,18 @@ import cg.dimension.model.criteria.RangeCriteria;
 import cg.dimension.model.matcher.RangeMatcher;
 import cg.dimension.model.property.BeanPropertyValueGenerator;
 
-public class TimeBucketAggregator<B> extends SimpleAggregator<B>
+public class TimeBucketAggregator<B> extends SimpleAggregator<B, Long>
 {
   protected long bucketBeginTime;
   protected long bucketTimeSpan;
   
   public TimeBucketAggregator(){};
+  
+  public TimeBucketAggregator(String name, BeanPropertyValueGenerator<B, Long> valueGenerator, Aggregate aggregate,
+      long bucketBeginTime, long bucketTimeSpan)
+  {
+    init(name, valueGenerator, aggregate, bucketBeginTime, bucketTimeSpan);
+  }
   
   public void init(String name, BeanPropertyValueGenerator<B, Long> valueGenerator, Aggregate aggregate,
       long bucketBeginTime, long bucketTimeSpan)

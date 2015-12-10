@@ -18,8 +18,8 @@ import cg.common.Calculator;
  */
 public class CompositeAggregator<B, V extends Number> implements Aggregator<B, V>
 {
+  protected String name;
   protected List<Aggregator<B, V>> subAggregators = Lists.newArrayList();
-  
   protected Class<V> valueType;
   
   public CompositeAggregator(Class<V> valueType)
@@ -89,10 +89,19 @@ public class CompositeAggregator<B, V extends Number> implements Aggregator<B, V
   {
     return valueType;
   }
-
   public void setValueType(Class<V> valueType)
   {
     this.valueType = valueType;
   }
 
+  public String getName()
+  {
+    return name;
+  }
+  public void setName(String name)
+  {
+    this.name = name;
+  }
+
+  
 }

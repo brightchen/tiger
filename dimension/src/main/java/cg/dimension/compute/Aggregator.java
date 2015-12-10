@@ -5,6 +5,7 @@ import cg.dimension.model.matcher.Matcher;
 
 /**
  * Aggregator compose criteria, aggregate and value provider
+ * 
  * @author bright
  *
  * @param <B>
@@ -21,5 +22,7 @@ public interface Aggregator<B, V extends Number> extends Matcher<V>, Aggregate<V
   public void processMatchedValue(V value);
   
   public void processBean(B bean);
+  
+  public String getName();
   
 }

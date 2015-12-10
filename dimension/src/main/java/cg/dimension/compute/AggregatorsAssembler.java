@@ -9,17 +9,24 @@ import com.google.common.collect.Sets;
 import cg.dimension.model.aggregate.Aggregate;
 import cg.dimension.model.aggregate.AggregateType;
 import cg.dimension.model.aggregate.IncrementalAggregateSum;
+import cg.dimension.model.criteria.Criteria;
 import cg.dimension.model.criteria.PropertyCriteria;
 import cg.dimension.model.property.BeanPropertyValueGenerator;
 
-public class DimensionComputation<T>
+/**
+ * The assembler of aggregators assemble aggregators and handle them in a unified way to increase the performance.
+ * @author bright
+ *
+ * @param <T>
+ */
+public class AggregatorsAssembler<T>
 {
-  protected Map<String, SimpleAggregator<T>> aggregatorMap = Maps.newHashMap();
+  protected Map<String, Aggregator<T, Number>> aggregatorMap = Maps.newHashMap();
   //use this structure the share the criteria and BeanPropertyValueGenerator to avoid duplicate computation
   protected Map<PropertyCriteria, Set<BeanPropertyValueGenerator>> criteriaToValueGenerator = Maps.newHashMap();
   protected Map<BeanPropertyValueGenerator, Set<Aggregate>> valueGeneratorToAggregate = Maps.newHashMap();
   
-  public DimensionComputation()
+  public AggregatorsAssembler()
   {
   }
   
@@ -31,7 +38,7 @@ public class DimensionComputation<T>
    * @param aggregateType
    * @return Aggregator in order to get value.
    */
-  public SimpleAggregator addAggregator(String name, PropertyCriteria criteria, BeanPropertyValueGenerator valueGenerator, Class aggregateValueType, AggregateType aggregateType)
+  public Aggregator addAggregator(String name, PropertyCriteria criteria, BeanPropertyValueGenerator valueGenerator, Class aggregateValueType, AggregateType aggregateType)
   {
     if(aggregatorMap.get(name) != null)
       throw new IllegalArgumentException("The aggregate name '" + name + "' already used.");
@@ -52,6 +59,28 @@ public class DimensionComputation<T>
     valueGeneratorToAggregate.get(valueGenerator).add(aggregate);
     
     return aggregator;
+  }
+  
+  public void addAggregator(AssembleAggregator aggregator)
+  {
+    if(aggregatorMap.get(aggregator.getName()) != null)
+      throw new IllegalArgumentException("The aggregate name '" + aggregator.getName() + "' already used.");
+    aggregatorMap.put(aggregator.getName(), aggregator);
+    
+    PropertyCriteria criteria = aggregator.getCriteria();
+    if(criteriaToValueGenerator.get(criteria) == null)
+    {
+      criteriaToValueGenerator.put(criteria, Sets.<BeanPropertyValueGenerator>newHashSet());
+    }
+    
+    BeanPropertyValueGenerator valueGenerator = aggregator.getValueGenerator();
+    criteriaToValueGenerator.get(criteria).add(valueGenerator);
+    
+    if(valueGeneratorToAggregate.get(valueGenerator) == null)
+    {
+      valueGeneratorToAggregate.put(valueGenerator, Sets.<Aggregate>newHashSet());
+    }
+    valueGeneratorToAggregate.get(valueGenerator).add(aggregator.getAggregate());
   }
   
   public void processRecord(T bean)
@@ -83,7 +112,7 @@ public class DimensionComputation<T>
   
   public void processRecordByAggregator(T bean)
   {
-    for(Map.Entry<String, SimpleAggregator<T>> aggregatorEntry : aggregatorMap.entrySet())
+    for(Map.Entry<String, Aggregator<T, Number>> aggregatorEntry : aggregatorMap.entrySet())
     {
       aggregatorEntry.getValue().processBean(bean);
     }
