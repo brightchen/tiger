@@ -4,7 +4,7 @@ import cg.dimension.model.aggregate.Aggregate;
 import cg.dimension.model.criteria.PropertyCriteria;
 import cg.dimension.model.property.BeanPropertyValueGenerator;
 
-public class SimpleAggregator<B, V extends Number> implements Aggregator<B, V>
+public class SimpleAggregator<B, V extends Number> implements AssembleAggregator<B, V>
 {
   protected String name;
   protected PropertyCriteria<B, V> criteria;

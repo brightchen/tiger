@@ -1,6 +1,6 @@
 package cg.dimension.model.matcher;
 
-public class EqualsMatcher<EV> implements Matcher<Object>
+public class EqualsMatcher<EV, V> implements Matcher<V>
 {
   protected EV expectedValue;
   
@@ -12,7 +12,7 @@ public class EqualsMatcher<EV> implements Matcher<Object>
   }
   
   @Override
-  public boolean matches(Object value)
+  public boolean matches(V value)
   {
     return expectedValue.equals(value);
   }

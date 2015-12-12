@@ -121,6 +121,7 @@ public class Calculator
   }
   
   
+  @SuppressWarnings("rawtypes")
   public static Map<Class, ValueSetter> typeToValueSetter = Maps.newHashMap();
   static {
     typeToValueSetter.put(Byte.class, new ValueSetter.ByteSetter());
@@ -130,6 +131,8 @@ public class Calculator
     typeToValueSetter.put(Float.class, new ValueSetter.FloatSetter());
     typeToValueSetter.put(Double.class, new ValueSetter.DoubleSetter());
   }
+  
+  @SuppressWarnings("unchecked")
   public static <T extends Number> T setValue(Class<T> type, double value)
   {
     return (T)typeToValueSetter.get(type).setValue(value);

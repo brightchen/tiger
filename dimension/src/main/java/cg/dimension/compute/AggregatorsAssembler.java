@@ -17,11 +17,11 @@ import cg.dimension.model.property.BeanPropertyValueGenerator;
  * The assembler of aggregators assemble aggregators and handle them in a unified way to increase the performance.
  * @author bright
  *
- * @param <T>
+ * @param <B>
  */
-public class AggregatorsAssembler<T>
+public class AggregatorsAssembler<B> implements BeanAggregators<B>
 {
-  protected Map<String, Aggregator<T, Number>> aggregatorMap = Maps.newHashMap();
+  protected Map<String, Aggregator<B, ?>> aggregatorMap = Maps.newHashMap();
   //use this structure the share the criteria and BeanPropertyValueGenerator to avoid duplicate computation
   protected Map<PropertyCriteria, Set<BeanPropertyValueGenerator>> criteriaToValueGenerator = Maps.newHashMap();
   protected Map<BeanPropertyValueGenerator, Set<Aggregate>> valueGeneratorToAggregate = Maps.newHashMap();
@@ -61,7 +61,7 @@ public class AggregatorsAssembler<T>
     return aggregator;
   }
   
-  public void addAggregator(AssembleAggregator aggregator)
+  public void addAggregator(AssembleAggregator<B, ?> aggregator)
   {
     if(aggregatorMap.get(aggregator.getName()) != null)
       throw new IllegalArgumentException("The aggregate name '" + aggregator.getName() + "' already used.");
@@ -83,12 +83,8 @@ public class AggregatorsAssembler<T>
     valueGeneratorToAggregate.get(valueGenerator).add(aggregator.getAggregate());
   }
   
-  public void processRecord(T bean)
-  {
-    processRecordByAggregator(bean);
-  }
   
-  public void processRecordAsWhole(T bean)
+  public void processRecord(B bean)
   {
     for(Map.Entry<PropertyCriteria, Set<BeanPropertyValueGenerator>> criteriaEntry : criteriaToValueGenerator.entrySet())
     {
@@ -107,14 +103,6 @@ public class AggregatorsAssembler<T>
           }
         }
       }
-    }
-  }
-  
-  public void processRecordByAggregator(T bean)
-  {
-    for(Map.Entry<String, Aggregator<T, Number>> aggregatorEntry : aggregatorMap.entrySet())
-    {
-      aggregatorEntry.getValue().processBean(bean);
     }
   }
   
