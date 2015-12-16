@@ -9,20 +9,22 @@ import cg.common.Calculator;
 /**
  * This aggregator keep lots of sub aggregators
  * preconditions
- *   - the aggregate should be same type: for example, all are SUM
  *   - handle same type of record
- *   - 
+ *   - the aggregate should be same type: for example, all are SUM
+ *   - the type of match value should be same
+ * 
+ * TimeBucketsAggregator is a typical case.
  * 
  * @author bright
  *
  */
-public class CompositeAggregator<B, V extends Number> implements Aggregator<B, V>
+public class CompositeAggregator<B, MV, AV extends Number> implements Aggregator<B, MV, AV>
 {
   protected String name;
-  protected List<Aggregator<B, V>> subAggregators = Lists.newArrayList();
-  protected Class<V> valueType;
+  protected List<Aggregator<B, MV, AV>> subAggregators = Lists.newArrayList();
+  protected Class<AV> valueType;
   
-  public CompositeAggregator(Class<V> valueType)
+  public CompositeAggregator(Class<AV> valueType)
   {
     this.valueType = valueType;
   }
@@ -35,9 +37,9 @@ public class CompositeAggregator<B, V extends Number> implements Aggregator<B, V
    * the relationship of criteria is or
    */
   @Override
-  public boolean matches(V value)
+  public boolean matches(MV value)
   {
-    for(Aggregator<B, V> subAggregator : subAggregators)
+    for(Aggregator<B, MV, AV> subAggregator : subAggregators)
     {
       if(subAggregator.matches(value))
         return true;
@@ -46,12 +48,12 @@ public class CompositeAggregator<B, V extends Number> implements Aggregator<B, V
   }
 
   @Override
-  public V getValue()
+  public AV getValue()
   {
     //depends on the aggregate type, for sum and count, add all. 
     //implement add here.
-    V value = Calculator.setValue(valueType, 0.0);
-    for(Aggregator<B, V> subAggregator : subAggregators)
+    AV value = Calculator.setValue(valueType, 0.0);
+    for(Aggregator<B, MV, AV> subAggregator : subAggregators)
     {
       value = Calculator.add(value, subAggregator.getValue());
     }
@@ -59,18 +61,19 @@ public class CompositeAggregator<B, V extends Number> implements Aggregator<B, V
   }
 
   @Override
-  public void addValue(V value)
+  public void addValue(AV value)
   {
-    for(Aggregator<B, V> subAggregator : subAggregators)
-    {
-      if(subAggregator.matches(value))
-        subAggregator.addValue(value);
-    }
+    //TODO: should implement this?
+//    for(Aggregator<B, MV, AV> subAggregator : subAggregators)
+//    {
+//      if(subAggregator.matches(value))
+//        subAggregator.addValue(value);
+//    }
     
   }
 
   @Override
-  public void processMatchedValue(V value)
+  public void processMatchedValue(AV value)
   {
     addValue(value);
   }
@@ -79,17 +82,17 @@ public class CompositeAggregator<B, V extends Number> implements Aggregator<B, V
   public void processBean(B bean)
   {
     //let the sub aggregator handle this bean
-    for(Aggregator<B, V> subAggregator : subAggregators)
+    for(Aggregator<B, MV, AV> subAggregator : subAggregators)
     {
       subAggregator.processBean(bean);
     }
   }
 
-  public Class<V> getValueType()
+  public Class<AV> getValueType()
   {
     return valueType;
   }
-  public void setValueType(Class<V> valueType)
+  public void setValueType(Class<AV> valueType)
   {
     this.valueType = valueType;
   }

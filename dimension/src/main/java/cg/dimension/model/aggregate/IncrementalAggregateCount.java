@@ -10,6 +10,11 @@ public class IncrementalAggregateCount implements Aggregate<Long>
   {
   }
   
+  public IncrementalAggregateCount(long count)
+  {
+    this.count = count;
+  }
+  
   @Override
   public Long getValue()
   {
@@ -23,6 +28,12 @@ public class IncrementalAggregateCount implements Aggregate<Long>
   public void addValue(Long value)
   {
     count++;
+  }
+
+  @Override
+  public IncrementalAggregateCount cloneMe()
+  {
+    return new IncrementalAggregateCount(count);
   }
 
 }

@@ -21,10 +21,10 @@ import cg.dimension.model.property.BeanPropertyValueGenerator;
  */
 public class AggregatorsAssembler<B> implements BeanAggregators<B>
 {
-  protected Map<String, Aggregator<B, ?>> aggregatorMap = Maps.newHashMap();
+  protected Map<String, Aggregator<B, ?, ? extends Number>> aggregatorMap = Maps.newHashMap();
   //use this structure the share the criteria and BeanPropertyValueGenerator to avoid duplicate computation
-  protected Map<PropertyCriteria, Set<BeanPropertyValueGenerator>> criteriaToValueGenerator = Maps.newHashMap();
-  protected Map<BeanPropertyValueGenerator, Set<Aggregate>> valueGeneratorToAggregate = Maps.newHashMap();
+  protected Map<PropertyCriteria<B, Object>, Set<BeanPropertyValueGenerator<B, Object>>> criteriaToMatchValueGenerator = Maps.newHashMap();
+  protected Map<BeanPropertyValueGenerator<B, Number>, Set<Aggregate<Number>>> aggregateValueGeneratorToAggregate = Maps.newHashMap();
   
   public AggregatorsAssembler()
   {
@@ -33,71 +33,75 @@ public class AggregatorsAssembler<B> implements BeanAggregators<B>
   /**
    * 
    * @param criteria
-   * @param valueGenerator
+   * @param matchValueGenerator
    * @param aggregateValueType
    * @param aggregateType
    * @return Aggregator in order to get value.
    */
-  public Aggregator addAggregator(String name, PropertyCriteria criteria, BeanPropertyValueGenerator valueGenerator, Class aggregateValueType, AggregateType aggregateType)
+  public <MV, AV extends Number> Aggregator<B, MV, AV> addAggregator(String name, PropertyCriteria<B, MV> criteria, 
+      BeanPropertyValueGenerator<B, MV> matchValueGenerator, 
+      BeanPropertyValueGenerator<B, AV> aggregateValueGenerator,
+      Class<AV> aggregateValueType, AggregateType aggregateType)
   {
     if(aggregatorMap.get(name) != null)
       throw new IllegalArgumentException("The aggregate name '" + name + "' already used.");
-    Aggregate aggregate = createDefaultAggregate(aggregateType, aggregateValueType);
-    SimpleAggregator aggregator = new SimpleAggregator(name, criteria, valueGenerator, aggregate);
+    Aggregate<AV> aggregate = createDefaultAggregate(aggregateType, aggregateValueType);
+    SimpleAggregator aggregator = new SimpleAggregator(name, criteria, matchValueGenerator, aggregate);
     aggregatorMap.put(name, aggregator);
     
-    if(criteriaToValueGenerator.get(criteria) == null)
+    if(criteriaToMatchValueGenerator.get(criteria) == null)
     {
-      criteriaToValueGenerator.put(criteria, Sets.<BeanPropertyValueGenerator>newHashSet());
+      criteriaToMatchValueGenerator.put((PropertyCriteria<B, Object>)criteria, Sets.<BeanPropertyValueGenerator<B, Object>>newHashSet());
     }
-    criteriaToValueGenerator.get(criteria).add(valueGenerator);
+    criteriaToMatchValueGenerator.get(criteria).add((BeanPropertyValueGenerator<B, Object>)matchValueGenerator);
     
-    if(valueGeneratorToAggregate.get(valueGenerator) == null)
+    if(aggregateValueGeneratorToAggregate.get(aggregateValueGenerator) == null)
     {
-      valueGeneratorToAggregate.put(valueGenerator, Sets.<Aggregate>newHashSet());
+      aggregateValueGeneratorToAggregate.put((BeanPropertyValueGenerator<B, Number>)aggregateValueGenerator, 
+          Sets.<Aggregate<Number>>newHashSet());
     }
-    valueGeneratorToAggregate.get(valueGenerator).add(aggregate);
+    aggregateValueGeneratorToAggregate.get(matchValueGenerator).add((Aggregate<Number>)aggregate);
     
     return aggregator;
   }
   
-  public void addAggregator(AssembleAggregator<B, ?> aggregator)
+  public void addAggregator(AssembleAggregator<B, Object, Number> aggregator)
   {
     if(aggregatorMap.get(aggregator.getName()) != null)
       throw new IllegalArgumentException("The aggregate name '" + aggregator.getName() + "' already used.");
     aggregatorMap.put(aggregator.getName(), aggregator);
     
-    PropertyCriteria criteria = aggregator.getCriteria();
-    if(criteriaToValueGenerator.get(criteria) == null)
+    PropertyCriteria<B, Object> criteria = aggregator.getCriteria();
+    if(criteriaToMatchValueGenerator.get(criteria) == null)
     {
-      criteriaToValueGenerator.put(criteria, Sets.<BeanPropertyValueGenerator>newHashSet());
+      criteriaToMatchValueGenerator.put(criteria, Sets.<BeanPropertyValueGenerator<B, Object>>newHashSet());
     }
+    BeanPropertyValueGenerator matcheValueGenerator = aggregator.getMatchValueGenerator();
+    criteriaToMatchValueGenerator.get(criteria).add(matcheValueGenerator);
     
-    BeanPropertyValueGenerator valueGenerator = aggregator.getValueGenerator();
-    criteriaToValueGenerator.get(criteria).add(valueGenerator);
-    
-    if(valueGeneratorToAggregate.get(valueGenerator) == null)
+    BeanPropertyValueGenerator<B, Number> aggregateValueGenerator = aggregator.getAggregateValueGenerator();
+    if(aggregateValueGeneratorToAggregate.get(aggregateValueGenerator) == null)
     {
-      valueGeneratorToAggregate.put(valueGenerator, Sets.<Aggregate>newHashSet());
+      aggregateValueGeneratorToAggregate.put(aggregateValueGenerator, Sets.<Aggregate<Number>>newHashSet());
     }
-    valueGeneratorToAggregate.get(valueGenerator).add(aggregator.getAggregate());
+    aggregateValueGeneratorToAggregate.get(aggregateValueGenerator).add(aggregator.getAggregate());
   }
   
   
   public void processRecord(B bean)
   {
-    for(Map.Entry<PropertyCriteria, Set<BeanPropertyValueGenerator>> criteriaEntry : criteriaToValueGenerator.entrySet())
+    for(Map.Entry<PropertyCriteria<B, Object>, Set<BeanPropertyValueGenerator<B, Object>>> criteriaEntry : criteriaToMatchValueGenerator.entrySet())
     {
       if(!criteriaEntry.getKey().matches(bean))
         continue;
       
-      for(BeanPropertyValueGenerator valueGenerator : criteriaEntry.getValue())
+      for(BeanPropertyValueGenerator<B, Object> valueGenerator : criteriaEntry.getValue())
       {
-        Object value = valueGenerator.getPropertyValue(bean);
+        Number value = (Number)valueGenerator.getPropertyValue(bean);
         
-        for(Map.Entry<BeanPropertyValueGenerator, Set<Aggregate>> valueGeneratorEntry : valueGeneratorToAggregate.entrySet())
+        for(Map.Entry<BeanPropertyValueGenerator<B, Number>, Set<Aggregate<Number>>> valueGeneratorEntry : aggregateValueGeneratorToAggregate.entrySet())
         {
-          for(Aggregate aggregate : valueGeneratorEntry.getValue())
+          for(Aggregate<Number> aggregate : valueGeneratorEntry.getValue())
           {
             aggregate.addValue(value);
           }
@@ -106,7 +110,7 @@ public class AggregatorsAssembler<B> implements BeanAggregators<B>
     }
   }
   
-  protected Aggregate createDefaultAggregate(AggregateType aggregateType, Class aggregateValueType)
+  protected <AV extends Number> Aggregate<AV> createDefaultAggregate(AggregateType aggregateType, Class<AV> aggregateValueType)
   {
     switch(aggregateType)
     {

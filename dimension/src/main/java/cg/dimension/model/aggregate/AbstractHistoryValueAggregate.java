@@ -14,7 +14,7 @@ import com.google.common.collect.Lists;
  * @author bright
  *
  */
-public abstract class AbstractHistoryValueAggregate<T> implements Aggregate<T>
+public abstract class AbstractHistoryValueAggregate<T extends Number> implements Aggregate<T>
 {
   public static final int DEFAULT_INIT_CAPACITY = 1024;
   

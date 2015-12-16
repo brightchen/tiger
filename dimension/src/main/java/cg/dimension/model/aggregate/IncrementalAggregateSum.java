@@ -6,6 +6,8 @@ public class IncrementalAggregateSum<T extends Number> implements Aggregate<T>
 {
   protected T sum;
   
+  public IncrementalAggregateSum(){}
+  
   public IncrementalAggregateSum(Class<T> type)
   {
     sum = Calculator.setValue(type, 0.0);
@@ -22,5 +24,15 @@ public class IncrementalAggregateSum<T extends Number> implements Aggregate<T>
   {
     sum = Calculator.add(sum, value);
   }
+
+  @Override
+  public Aggregate<T> cloneMe()
+  {
+    IncrementalAggregateSum cloned = new IncrementalAggregateSum();
+    cloned.sum = this.sum;
+    return cloned;
+  }
+
+
 
 }

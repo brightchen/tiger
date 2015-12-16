@@ -9,23 +9,18 @@ import cg.dimension.model.criteria.PropertyCriteria;
 import cg.dimension.model.property.BeanPropertyValueGenerator;
 
 /**
+ * This class used when the time period (begin time and end time) is fixed.
  * @author bright
  *
  * @param <B>
- * @param <V>
+ * @param <AV>
  */
-public abstract class AbstractTimeSlideAggregator<B, V extends Number> extends CompositeAggregator<B, V>
+public abstract class AbstractFiexedTimeBucketsAggregator<B, MV, AV extends Number> extends CompositeAggregator<B, MV, AV>
 {
-  public static enum TimeBaseType
-  {
-    CurrentTime,
-    SpecificTime
-  }
-  
+  public static final int DEFAULT_SLIDE_STEP = 1000;  //default is 1 second
   protected String name;
-  protected long slideStep;     //for example 1 second
+  protected long slideStep = DEFAULT_SLIDE_STEP;     //for example 1 second
   protected long timePeriod;    //for example 1 hour
-  protected TimeBaseType timeBaseType;
   protected long baseTime;      //this field is be managed by this class if timeBaseType is CurrentTime
   
   /**
@@ -34,16 +29,16 @@ public abstract class AbstractTimeSlideAggregator<B, V extends Number> extends C
    */
   protected boolean alignTime = true;  
   
-  public AbstractTimeSlideAggregator(){}
+  public AbstractFiexedTimeBucketsAggregator(){}
   
   //slide base on current time
-  public AbstractTimeSlideAggregator(long timePeriod, long slideStep)
+  public AbstractFiexedTimeBucketsAggregator(long timePeriod, long slideStep)
   {
     init(timePeriod, slideStep);
   }
   
   //slide base on specific time
-  public AbstractTimeSlideAggregator(long timePeriod, long slideStep, long baseTime)
+  public AbstractFiexedTimeBucketsAggregator(long timePeriod, long slideStep, long baseTime)
   {
     init(timePeriod, slideStep, baseTime);
   }
@@ -52,7 +47,6 @@ public abstract class AbstractTimeSlideAggregator<B, V extends Number> extends C
   {
     this.timePeriod = timePeriod;
     this.slideStep = slideStep;
-    timeBaseType = TimeBaseType.CurrentTime;
   }
   
   public void init(long timePeriod, long slideStep, long baseTime)
@@ -60,17 +54,16 @@ public abstract class AbstractTimeSlideAggregator<B, V extends Number> extends C
     this.timePeriod = timePeriod;
     this.slideStep = slideStep;
     this.baseTime = baseTime;
-    timeBaseType = TimeBaseType.SpecificTime;
   }
   
+  /**
+   * delay call this method until it required to give the chance for the client code to set the parameters
+   */
   protected void createSubAggregators()
   {
     int aggregatorNum = (int)(timePeriod/slideStep + timePeriod%slideStep);
     long bucketTimeSpan = slideStep;
-    if(TimeBaseType.CurrentTime == timeBaseType)
-    {
-      baseTime = Calendar.getInstance().getTimeInMillis();
-    }
+    baseTime = Calendar.getInstance().getTimeInMillis();
     if(alignTime)
     {
       baseTime -= baseTime%slideStep;
@@ -86,8 +79,16 @@ public abstract class AbstractTimeSlideAggregator<B, V extends Number> extends C
     
   }
   
+  public void validateArguments() throws IllegalArgumentException
+  {
+    if(timePeriod <= 0)
+      throw new IllegalArgumentException("timePeriod should not less or equal zero");
+    if(slideStep <= 0)
+      throw new IllegalArgumentException("slideStep should not less or equal zero");
+  }
 
   /**
+   * TODO: increase the performance
    * we can use the same logic as CompositeAggregator.
    * But it performance well.
    * we should locate the sub-aggregator and just delegate to it instead of waste time by delegate to other aggregators
@@ -95,8 +96,14 @@ public abstract class AbstractTimeSlideAggregator<B, V extends Number> extends C
   @Override
   public void processBean(B bean)
   {
+    validateArguments();
+    if(subAggregators.isEmpty())
+    {
+      createSubAggregators();
+    }
+    
     //let the sub aggregator handle this bean
-    for(Aggregator<B, V> subAggregator : subAggregators)
+    for(Aggregator<B, MV, AV> subAggregator : subAggregators)
     {
       subAggregator.processBean(bean);
     }
@@ -134,16 +141,6 @@ public abstract class AbstractTimeSlideAggregator<B, V extends Number> extends C
     this.timePeriod = timePeriod;
   }
 
-  public TimeBaseType getTimeBaseType()
-  {
-    return timeBaseType;
-  }
-
-  public void setTimeBaseType(TimeBaseType timeBaseType)
-  {
-    this.timeBaseType = timeBaseType;
-  }
-
   public long getBaseTime()
   {
     return baseTime;
@@ -163,6 +160,5 @@ public abstract class AbstractTimeSlideAggregator<B, V extends Number> extends C
   {
     this.alignTime = alignTime;
   }
-  
   
 }

@@ -4,9 +4,10 @@ import cg.dimension.model.aggregate.Aggregate;
 import cg.dimension.model.criteria.PropertyCriteria;
 import cg.dimension.model.property.BeanPropertyValueGenerator;
 
-public interface Assemble<B, V>
+public interface Assemble<B, MV, AV extends Number>
 {
-  public PropertyCriteria<B, V> getCriteria();
-  public BeanPropertyValueGenerator<B, V> getValueGenerator();
-  public Aggregate<V> getAggregate();
+  public PropertyCriteria<B, MV> getCriteria();
+  public BeanPropertyValueGenerator<B, MV> getMatchValueGenerator();
+  public BeanPropertyValueGenerator<B, AV> getAggregateValueGenerator();
+  public Aggregate<AV> getAggregate();
 }

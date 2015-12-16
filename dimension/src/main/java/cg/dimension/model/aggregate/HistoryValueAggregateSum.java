@@ -1,6 +1,6 @@
 package cg.dimension.model.aggregate;
 
-public abstract class HistoryValueAggregateSum<T> extends AbstractHistoryValueAggregate<T>
+public abstract class HistoryValueAggregateSum<T extends Number> extends AbstractHistoryValueAggregate<T>
 {
   @Override
   public T getValue()

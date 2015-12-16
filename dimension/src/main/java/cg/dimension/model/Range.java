@@ -18,7 +18,7 @@ public class Range<T> {
       int result = ((Comparable)value).compareTo(from);
       if(result == 0)
         return true;
-      return (Math.signum(result) * Math.signum(((Comparable)value).compareTo(to)) > 0);
+      return (Math.signum(result) != Math.signum(((Comparable)value).compareTo(to)) );
     }
     throw new IllegalStateException("The range is not comparable");
   }
