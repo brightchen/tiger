@@ -1,4 +1,4 @@
-package cg.dimension.compute;
+package cg.dimension.aggregator;
 
 import cg.dimension.model.Range;
 import cg.dimension.model.aggregate.Aggregate;

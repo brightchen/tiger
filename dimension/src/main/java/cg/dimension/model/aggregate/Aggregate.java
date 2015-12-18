@@ -1,8 +1,8 @@
 package cg.dimension.model.aggregate;
 
-public interface Aggregate<T extends Number> extends Cloneable<Aggregate<T>>
+public interface Aggregate<V extends Number>
 {
-  public T getValue();
-  public void addValue(T value);
+  public V getValue();
+  public void addValue(V value);
 
 }

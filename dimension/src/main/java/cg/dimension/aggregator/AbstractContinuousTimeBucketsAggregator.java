@@ -1,4 +1,4 @@
-package cg.dimension.compute;
+package cg.dimension.aggregator;
 
 import java.util.Map;
 import java.util.Set;
@@ -9,27 +9,29 @@ import com.google.common.collect.Sets;
 import cg.dimension.model.aggregate.Aggregate;
 import cg.dimension.model.aggregate.AggregateType;
 import cg.dimension.model.aggregate.IncrementalAggregateSum;
-import cg.dimension.model.criteria.Criteria;
 import cg.dimension.model.criteria.PropertyCriteria;
 import cg.dimension.model.property.BeanPropertyValueGenerator;
 
 /**
- * The assembler of aggregators assemble aggregators and handle them in a unified way to increase the performance.
+ * precondition: the time is continuous. the bucket will be created even if no bean fit to the bucket
+ * for example: sum of salary and average of age of all records generated after 10:00AM
+ * 
  * @author bright
  *
  * @param <B>
+ * @param <MV>
+ * @param <AV>
  */
-public class AggregatorsAssembler<B> implements BeanAggregators<B>
+public abstract class AbstractContinuousTimeBucketsAggregator<B, MV, AV extends Number> implements AssembleAggregator<B, MV, AV>
 {
   protected Map<String, Aggregator<B, ?, ? extends Number>> aggregatorMap = Maps.newHashMap();
+  protected Aggregate<AV>[] aggregaes;
+  
   //use this structure the share the criteria and BeanPropertyValueGenerator to avoid duplicate computation
   protected Map<PropertyCriteria<B, Object>, Set<BeanPropertyValueGenerator<B, Object>>> criteriaToMatchValueGenerator = Maps.newHashMap();
   protected Map<BeanPropertyValueGenerator<B, Number>, Set<Aggregate<Number>>> aggregateValueGeneratorToAggregate = Maps.newHashMap();
   
-  public AggregatorsAssembler()
-  {
-  }
-  
+
   /**
    * 
    * @param criteria
@@ -87,8 +89,8 @@ public class AggregatorsAssembler<B> implements BeanAggregators<B>
     aggregateValueGeneratorToAggregate.get(aggregateValueGenerator).add(aggregator.getAggregate());
   }
   
-  
-  public void processRecord(B bean)
+  @Override
+  public void processBean(B bean)
   {
     for(Map.Entry<PropertyCriteria<B, Object>, Set<BeanPropertyValueGenerator<B, Object>>> criteriaEntry : criteriaToMatchValueGenerator.entrySet())
     {
@@ -97,7 +99,7 @@ public class AggregatorsAssembler<B> implements BeanAggregators<B>
       
       for(BeanPropertyValueGenerator<B, Object> valueGenerator : criteriaEntry.getValue())
       {
-        Number value = (Number)valueGenerator.getPropertyValue(bean);
+        Number value = (Number)valueGenerator.getValue(bean);
         
         for(Map.Entry<BeanPropertyValueGenerator<B, Number>, Set<Aggregate<Number>>> valueGeneratorEntry : aggregateValueGeneratorToAggregate.entrySet())
         {

@@ -1,39 +1,18 @@
 package cg.dimension.model.aggregate;
 
-import cg.common.Calculator;
-
-public class IncrementalAggregateCount implements Aggregate<Long>
+/**
+ * count can be treated as the special case of sum, which every value is 1;
+ * @author bright
+ *
+ */
+public class IncrementalAggregateCount extends IncrementalAggregateSum<Long>
 {
-  protected long count = 0;
-  
-  public IncrementalAggregateCount()
-  {
-  }
-  
-  public IncrementalAggregateCount(long count)
-  {
-    this.count = count;
-  }
-  
-  @Override
-  public Long getValue()
-  {
-    return count;
-  }
-
   /**
    * for Count, ignore the value of bean
    */
   @Override
   public void addValue(Long value)
   {
-    count++;
+    sum++;
   }
-
-  @Override
-  public IncrementalAggregateCount cloneMe()
-  {
-    return new IncrementalAggregateCount(count);
-  }
-
 }

@@ -1,12 +1,12 @@
-package cg.dimension.compute;
+package cg.dimension.aggregatorcoll;
 
 /**
  * The aggregators of same type of bean
  * @author bright
  *
  */
-public interface BeanAggregators<B>
+public interface AggregatorCollection<B>
 {
-  public void processRecord(B bean);
+  public void processBean(B bean);
   public Object getValue(String aggregatorName);
 }

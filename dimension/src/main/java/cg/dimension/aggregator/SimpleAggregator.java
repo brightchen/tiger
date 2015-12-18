@@ -1,11 +1,11 @@
-package cg.dimension.compute;
+package cg.dimension.aggregator;
 
 import cg.dimension.model.aggregate.Aggregate;
 import cg.dimension.model.criteria.PropertyCriteria;
 import cg.dimension.model.property.BeanPropertyValueGenerator;
 
 /**
- * SimpleAggregator is the aggregator which use the same property of bean to match and calculate the aggregate
+ * SimpleAggregator use the criteria to match the bean, and use the aggregateValueGenerator to generate the value for aggregating. 
  * @author bright
  *
  * @param <B>
@@ -15,7 +15,7 @@ public class SimpleAggregator<B, V extends Number> implements AssembleAggregator
 {
   protected String name;
   protected PropertyCriteria<B, V> criteria;
-  protected BeanPropertyValueGenerator<B, V> valueGenerator;    //related to a property (bean/property), for both match value and aggregate value
+  protected BeanPropertyValueGenerator<B, V> aggregateValueGenerator;    //related to a property (bean/property), for both match value and aggregate value
   protected Aggregate<V> aggregate;
   
   public SimpleAggregator(){}
@@ -30,7 +30,7 @@ public class SimpleAggregator<B, V extends Number> implements AssembleAggregator
   {
     this.name = name;
     this.setCriteria(criteria);
-    this.setValueGenerator(valueGenerator);
+    this.setAggregateValueGenerator(valueGenerator);
     this.setAggregate(aggregate);
   }
   
@@ -51,7 +51,7 @@ public class SimpleAggregator<B, V extends Number> implements AssembleAggregator
   {
     if(!criteria.matches(bean))
       return;
-    V value = (V)valueGenerator.getPropertyValue(bean);
+    V value = (V)aggregateValueGenerator.getValue(bean);
     aggregate.addValue(value);
   }
   
@@ -77,14 +77,9 @@ public class SimpleAggregator<B, V extends Number> implements AssembleAggregator
     this.criteria = criteria;
   }
 
-  public BeanPropertyValueGenerator<B, V> getValueGenerator()
+  public void setAggregateValueGenerator(BeanPropertyValueGenerator<B, V> valueGenerator)
   {
-    return valueGenerator;
-  }
-
-  public void setValueGenerator(BeanPropertyValueGenerator<B, V> valueGenerator)
-  {
-    this.valueGenerator = valueGenerator;
+    this.aggregateValueGenerator = valueGenerator;
   }
 
   public Aggregate<V> getAggregate()
@@ -117,12 +112,13 @@ public class SimpleAggregator<B, V extends Number> implements AssembleAggregator
   @Override
   public BeanPropertyValueGenerator<B, V> getMatchValueGenerator()
   {
-    return valueGenerator;
+    return criteria.getMatchValueGenerator();
   }
 
   @Override
   public BeanPropertyValueGenerator<B, V> getAggregateValueGenerator()
   {
-    return valueGenerator;
+    return aggregateValueGenerator;
   }
+
 }

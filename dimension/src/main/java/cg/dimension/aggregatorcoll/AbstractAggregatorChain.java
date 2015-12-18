@@ -1,15 +1,17 @@
-package cg.dimension.compute;
+package cg.dimension.aggregatorcoll;
 
 import java.util.Map;
 
 import com.google.common.collect.Maps;
 
+import cg.dimension.aggregator.Aggregator;
+
 /**
- * AggregatorChain is not a aggregator, but a chain of aggregator which process same type of Bean
+ * AggregatorCollection is not a aggregator, but a collection of aggregator which process same type of Bean
  * @author bright
  *
  */
-public abstract class AbstractAggregatorChain<B> implements BeanAggregators<B>
+public abstract class AbstractAggregatorChain<B> implements AggregatorCollection<B>
 {
   protected Map<String, Aggregator<B, ?, ? extends Number>> nameToAggregator = Maps.newHashMap();
   

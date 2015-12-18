@@ -1,4 +1,4 @@
-package cg.dimension.compute;
+package cg.dimension.aggregator;
 
 import java.util.List;
 

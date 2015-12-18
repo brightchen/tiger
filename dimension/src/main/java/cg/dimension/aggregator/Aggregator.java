@@ -1,4 +1,4 @@
-package cg.dimension.compute;
+package cg.dimension.aggregator;
 
 import cg.dimension.model.aggregate.Aggregate;
 import cg.dimension.model.matcher.Matcher;
@@ -12,7 +12,7 @@ import cg.dimension.model.matcher.Matcher;
  * @param <B>
  * @param <V>
  */
-public interface Aggregator<B, MV, AV extends Number> extends Matcher<MV>//, Aggregate<AV>
+public interface Aggregator<B, MV, AV extends Number> extends Matcher<MV>, Aggregate<AV>
 {
   /**
    * this assume the value already match the criteria.
@@ -27,6 +27,5 @@ public interface Aggregator<B, MV, AV extends Number> extends Matcher<MV>//, Agg
   public String getName();
   
   public AV getValue();
-  public void addValue(AV value);
 
 }

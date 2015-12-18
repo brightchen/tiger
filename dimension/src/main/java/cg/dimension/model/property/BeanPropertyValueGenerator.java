@@ -4,6 +4,7 @@ import com.datatorrent.lib.util.PojoUtils;
 import com.datatorrent.lib.util.PojoUtils.Getter;
 
 import cg.dimension.ReflectionUtil;
+import cg.dimension.model.ValueGenerator;
 
 /**
  * Get the the value of an property.
@@ -12,7 +13,7 @@ import cg.dimension.ReflectionUtil;
  *
  * @param <B>
  */
-public class BeanPropertyValueGenerator<B, V>
+public class BeanPropertyValueGenerator<B, V> implements ValueGenerator<B, V>
 {
   protected Getter<B, V> getter;
   
@@ -38,7 +39,8 @@ public class BeanPropertyValueGenerator<B, V>
     getter = PojoUtils.createGetter(beanClass, propertyInfo.getPropertyExpression(), propertyInfo.getType().getJavaType());
   }
   
-  public V getPropertyValue(B bean)
+  @Override
+  public V getValue(B bean)
   {
     return getter.get(bean);
   }

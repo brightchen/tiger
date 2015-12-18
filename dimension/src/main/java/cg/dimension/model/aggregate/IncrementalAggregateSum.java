@@ -2,33 +2,33 @@ package cg.dimension.model.aggregate;
 
 import cg.common.Calculator;
 
-public class IncrementalAggregateSum<T extends Number> implements Aggregate<T>
+public class IncrementalAggregateSum<AV extends Number> implements CloneableAggregate<AV>
 {
-  protected T sum;
+  protected AV sum;
   
   public IncrementalAggregateSum(){}
   
-  public IncrementalAggregateSum(Class<T> type)
+  public IncrementalAggregateSum(Class<AV> type)
   {
     sum = Calculator.setValue(type, 0.0);
   }
   
   @Override
-  public T getValue()
+  public AV getValue()
   {
     return sum;
   }
 
   @Override
-  public void addValue(T value)
+  public void addValue(AV value)
   {
     sum = Calculator.add(sum, value);
   }
 
   @Override
-  public Aggregate<T> cloneMe()
+  public IncrementalAggregateSum<AV> cloneMe()
   {
-    IncrementalAggregateSum cloned = new IncrementalAggregateSum();
+    IncrementalAggregateSum<AV> cloned = new IncrementalAggregateSum<>();
     cloned.sum = this.sum;
     return cloned;
   }

@@ -14,17 +14,17 @@ import com.google.common.collect.Lists;
  * @author bright
  *
  */
-public abstract class AbstractHistoryValueAggregate<T extends Number> implements Aggregate<T>
+public abstract class AbstractHistoryValueAggregate<AV extends Number> implements CloneableAggregate<AV>
 {
   public static final int DEFAULT_INIT_CAPACITY = 1024;
   
   protected int initCapacity = DEFAULT_INIT_CAPACITY;
-  protected List<T> values = Lists.newArrayListWithCapacity(initCapacity);
+  protected List<AV> values = Lists.newArrayListWithCapacity(initCapacity);
   
   protected ReadWriteLock rwLock = new ReentrantReadWriteLock();
   
   @Override
-  public void addValue(T value)
+  public void addValue(AV value)
   {
     rwLock.writeLock().lock();
     try

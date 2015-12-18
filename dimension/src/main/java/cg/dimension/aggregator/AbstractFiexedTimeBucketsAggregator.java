@@ -1,4 +1,4 @@
-package cg.dimension.compute;
+package cg.dimension.aggregator;
 
 import java.util.Calendar;
 
@@ -10,6 +10,8 @@ import cg.dimension.model.property.BeanPropertyValueGenerator;
 
 /**
  * This class used when the time period (begin time and end time) is fixed.
+ * 
+ * TODO: maybe better to use AssembleAggregator.
  * @author bright
  *
  * @param <B>

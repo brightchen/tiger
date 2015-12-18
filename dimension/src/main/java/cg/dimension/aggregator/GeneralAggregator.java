@@ -1,4 +1,4 @@
-package cg.dimension.compute;
+package cg.dimension.aggregator;
 
 import cg.dimension.model.aggregate.Aggregate;
 import cg.dimension.model.criteria.PropertyCriteria;
@@ -10,7 +10,7 @@ import cg.dimension.model.property.BeanPropertyValueGenerator;
  *
  * @param <B> the type of bean
  * @param <MV> the type of the value used for match
- * @param <AV> the type of the value for aggreate
+ * @param <AV> the type of the value for aggregate
  */
 public class GeneralAggregator<B, MV, AV extends Number> implements AssembleAggregator<B, MV, AV>
 {
@@ -55,7 +55,7 @@ public class GeneralAggregator<B, MV, AV extends Number> implements AssembleAggr
   {
     if(!criteria.matches(bean))
       return;
-    AV value = (AV)aggregateValueGenerator.getPropertyValue(bean);
+    AV value = (AV)aggregateValueGenerator.getValue(bean);
     aggregate.addValue(value);
   }
   
