@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import cg.common.Calculator;
+import cg.common.math.Calculator;
 
 /**
  * This aggregator keep lots of sub aggregators

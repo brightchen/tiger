@@ -1,4 +1,4 @@
-package cg.common;
+package cg.common.math;
 
 import java.util.Map;
 

@@ -3,6 +3,8 @@ package cg.common;
 import org.junit.Assert;
 import org.junit.Test;
 
+import cg.common.math.Calculator;
+
 public class CalculatorTester
 {
   @Test

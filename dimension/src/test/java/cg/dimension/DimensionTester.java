@@ -16,7 +16,17 @@ import cg.dimension.model.aggregate.IncrementalAggregateSum;
 import cg.dimension.model.criteria.PropertyCriteria;
 import cg.dimension.model.matcher.EqualsMatcher;
 import cg.dimension.model.property.BeanPropertyValueGenerator;
+import cg.dimension.order.TestRecord;
 
+/**
+ * use a order analytics system as the test case. cases
+ *   - for distribution/logistic: product info group by location( country and zip, month );
+ *   - product info group by ( country&state, sex, age range( kids, young, middle, old )
+ *    
+ * The 
+ * @author bright
+ *
+ */
 public class DimensionTester
 {
   private static final Logger logger = LoggerFactory.getLogger(DimensionTester.class);

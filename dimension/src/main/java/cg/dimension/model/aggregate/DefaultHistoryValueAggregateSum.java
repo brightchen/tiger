@@ -1,6 +1,6 @@
 package cg.dimension.model.aggregate;
 
-import cg.common.Calculator;
+import cg.common.math.Calculator;
 
 public class DefaultHistoryValueAggregateSum<T extends Number> extends AbstractHistoryValueAggregateSum<T>
 {
