@@ -19,11 +19,6 @@ import cg.dimension.model.property.BeanPropertyValueGenerator;
 import cg.dimension.order.TestRecord;
 
 /**
- * use a order analytics system as the test case. cases
- *   - for distribution/logistic: product info group by location( country and zip, month );
- *   - product info group by ( country&state, sex, age range( kids, young, middle, old )
- *    
- * The 
  * @author bright
  *
  */

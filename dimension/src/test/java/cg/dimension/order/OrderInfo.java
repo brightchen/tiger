@@ -4,6 +4,6 @@ import java.util.Calendar;
 
 public class OrderInfo {
   public Calendar orderTime;
-  public String payMethod;
+  public PayMethod payMethod;
   
 }
