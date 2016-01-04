@@ -12,6 +12,7 @@ import cg.dimension.aggregator.SimpleAggregator;
 import cg.dimension.aggregatorcoll.DefaultAggregatorChain;
 import cg.dimension.model.aggregate.AggregateCloneFactory;
 import cg.dimension.model.aggregate.AggregateFactory;
+import cg.dimension.model.aggregate.CloneableAggregate;
 import cg.dimension.model.aggregate.IncrementalAggregateSum;
 import cg.dimension.model.criteria.PropertyCriteria;
 import cg.dimension.model.matcher.EqualsMatcher;
@@ -48,7 +49,7 @@ public class DimensionTester
     {
       BeanPropertyValueGenerator<TestRecord, Long> timeGenerator = new BeanPropertyValueGenerator<>(TestRecord.class, "createdTime", Long.class);
       BeanPropertyValueGenerator<TestRecord, Integer> ageGenerator = new BeanPropertyValueGenerator<>(TestRecord.class, "age", Integer.class);
-      AggregateFactory<Integer> aggregateFactory = new AggregateCloneFactory<Integer>(new IncrementalAggregateSum<Integer>(Integer.class));
+      AggregateFactory<? extends CloneableAggregate<?, Integer>, Integer> aggregateFactory = new AggregateCloneFactory<>(new IncrementalAggregateSum<Integer>(Integer.class));
       DefaultFiexedTimeBucketsAggregator<TestRecord, Integer> aggregator = new DefaultFiexedTimeBucketsAggregator<>(timeGenerator, ageGenerator,
           aggregateFactory );
       aggregator.setName("2");

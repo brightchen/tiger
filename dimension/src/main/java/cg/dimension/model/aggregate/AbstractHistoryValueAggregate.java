@@ -14,7 +14,8 @@ import com.google.common.collect.Lists;
  * @author bright
  *
  */
-public abstract class AbstractHistoryValueAggregate<AV extends Number> implements CloneableAggregate<AV>
+public abstract class AbstractHistoryValueAggregate<T extends AbstractHistoryValueAggregate<T, AV>, AV extends Number> 
+    implements CloneableAggregate<T, AV>
 {
   public static final int DEFAULT_INIT_CAPACITY = 1024;
   

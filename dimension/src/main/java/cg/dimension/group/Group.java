@@ -1,6 +1,4 @@
-package cg.dimension.model.group;
-
-import cg.dimension.model.matcher.Matcher;
+package cg.dimension.group;
 
 /**
  * There are two types of group:

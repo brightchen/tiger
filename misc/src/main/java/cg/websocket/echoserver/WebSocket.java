@@ -1,4 +1,4 @@
-package cg.websocket;
+package cg.websocket.echoserver;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.websocket.server.WebSocketHandler;

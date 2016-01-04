@@ -1,4 +1,4 @@
-package cg.websocket;
+package cg.websocket.echoserver;
 
 import java.io.IOException;
 import org.eclipse.jetty.websocket.api.Session;

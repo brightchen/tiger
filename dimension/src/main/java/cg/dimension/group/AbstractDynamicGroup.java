@@ -1,9 +1,10 @@
-package cg.dimension.model.group;
+package cg.dimension.group;
 
+import cg.dimension.model.CloneableBean;
 import cg.dimension.model.matcher.Matcher;
 import cg.dimension.model.property.BeanPropertyValueGenerator;
 
-public abstract class AbstractDynamicGroup<B, MV> implements Group<B>
+public abstract class AbstractDynamicGroup<T extends CloneableBean<T>, B, MV> implements CloneableGroup<T, B>
 {
   protected BeanPropertyValueGenerator<B, MV> matchPropertyValueGenerator;
   protected Matcher<MV> matcher;

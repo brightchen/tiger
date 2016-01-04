@@ -1,0 +1,5 @@
+ - AbstractGroupAggregate only handle one group, need Groups to handle all group
+ - GroupAggregateByEqualsMatcher: one matcher need one class, think about a generic way to create matcher for dynamic group. 
+   for example, a sub interface matcher supports clone and setvalue. so create match can be implemented by a template matcher
+ - The TimeBucketsAggregator should be a special case of group.
+ - considering merge group with Aggregator.

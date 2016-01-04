@@ -1,5 +1,7 @@
 package cg.dimension.model.aggregate;
 
-public interface CloneableAggregate<V extends Number> extends Aggregate<V>, Cloneable<Aggregate<V>>   //Cloneable<CloneableAggregate<V>> can't compiled?
+import cg.dimension.model.CloneableBean;
+
+public interface CloneableAggregate<T extends CloneableAggregate<T, V>, V extends Number> extends Aggregate<V>, CloneableBean<T> 
 {
 }

@@ -107,6 +107,7 @@ public class Calculator
     }
   }
 
+  @SuppressWarnings("unchecked")
   public static <T extends Number> T add(T value1, T value2)
   {
     return (T)sameTypeToAdder.get(value1.getClass()).addTo(value1, value2);
@@ -114,7 +115,8 @@ public class Calculator
 
   public static <T extends Number, R extends Number> R addTo(R orgValue, T value)
   {
-    AddTo addTo = typePairToAddTo.get(new ClassPair(value.getClass(), orgValue.getClass()));
+    @SuppressWarnings("unchecked")
+    AddTo<R, T> addTo = typePairToAddTo.get(new ClassPair(value.getClass(), orgValue.getClass()));
     if(addTo == null)
       throw new UnsupportedOperationException("Not Support add " + value.getClass() + " to " + orgValue.getClass());
     return (R)addTo.addTo(orgValue, value);

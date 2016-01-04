@@ -2,36 +2,36 @@ package cg.dimension.model.aggregate;
 
 import cg.common.math.Calculator;
 
-public class DefaultHistoryValueAggregateSum<T extends Number> extends AbstractHistoryValueAggregateSum<T>
+public class DefaultHistoryValueAggregateSum<V extends Number> 
+    extends AbstractHistoryValueAggregateSum<DefaultHistoryValueAggregateSum<V>, V>
 {
-  protected T sum;
+  protected V sum;
   
   public DefaultHistoryValueAggregateSum(){}
   
-  public DefaultHistoryValueAggregateSum(Class<T> type)
+  public DefaultHistoryValueAggregateSum(Class<V> type)
   {
     sum = Calculator.setValue(type, 0.0);
   }
   
   
   @Override
-  public DefaultHistoryValueAggregateSum<T> cloneMe()
+  public DefaultHistoryValueAggregateSum<V> cloneMe()
   {
-    DefaultHistoryValueAggregateSum<T> cloned = new DefaultHistoryValueAggregateSum<>();
+    DefaultHistoryValueAggregateSum<V> cloned = new DefaultHistoryValueAggregateSum<>();
     cloned.sum = this.sum;
     return cloned;
   }
 
   @Override
-  protected void sum(T value)
+  protected void sum(V value)
   {
     sum = Calculator.add(sum, value);
   }
 
   @Override
-  protected T getSum()
+  protected V getSum()
   {
     return sum;
   }
-
 }

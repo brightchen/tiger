@@ -1,4 +1,4 @@
-package cg.dimension.model.group;
+package cg.dimension.group;
 
 import cg.dimension.model.matcher.Matcher;
 import cg.dimension.model.property.BeanPropertyValueGenerator;

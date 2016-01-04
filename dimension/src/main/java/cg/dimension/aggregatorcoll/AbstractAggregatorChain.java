@@ -8,6 +8,7 @@ import cg.dimension.aggregator.Aggregator;
 
 /**
  * AggregatorCollection is not a aggregator, but a collection of aggregator which process same type of Bean
+ * 
  * @author bright
  *
  */

@@ -30,7 +30,7 @@ public class OrderInfoRandomGenerator implements BeanGenerator<OrderInfo>
 
   public OrderInfoRandomGenerator(Range<Calendar> orderTimeRange)
   {
-    this.orderTimeRange = orderTimeRange;
+    setOrderTimeRange(orderTimeRange);
   }
   
   @Override
