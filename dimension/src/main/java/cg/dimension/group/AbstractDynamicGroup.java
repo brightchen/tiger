@@ -4,6 +4,17 @@ import cg.dimension.model.CloneableBean;
 import cg.dimension.model.matcher.Matcher;
 import cg.dimension.model.property.BeanPropertyValueGenerator;
 
+/**
+ * The matcher is probably depended on the value.
+ * Think about the case group by zip, when a new zip come, a new group should dynamically created.
+ * and the matcher for this group should depend on the zip.
+ * 
+ * @author bright
+ *
+ * @param <T>
+ * @param <B>
+ * @param <MV>
+ */
 public abstract class AbstractDynamicGroup<T extends CloneableBean<T>, B, MV> implements CloneableGroup<T, B>
 {
   protected BeanPropertyValueGenerator<B, MV> matchPropertyValueGenerator;

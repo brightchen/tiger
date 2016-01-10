@@ -5,6 +5,15 @@ import cg.dimension.model.aggregate.Aggregate;
 import cg.dimension.model.matcher.Matcher;
 import cg.dimension.model.property.BeanPropertyValueGenerator;
 
+/**
+ * 
+ * @author bright
+ *
+ * @param <T> The class which AbstractGroupAggregate can clone to
+ * @param <B>
+ * @param <MV>
+ * @param <AV>
+ */
 public abstract class AbstractGroupAggregate<T extends CloneableBean<T>, B, MV, AV extends Number> extends AbstractDynamicGroup<T, B, MV>
 {
   protected BeanPropertyValueGenerator<B, AV> aggregatePropertyValueGenerator;

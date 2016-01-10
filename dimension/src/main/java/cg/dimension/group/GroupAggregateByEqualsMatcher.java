@@ -19,7 +19,7 @@ public class GroupAggregateByEqualsMatcher<B, MV, AV extends Number> extends Abs
     this.matcher = new EqualsMatcher<>(value);
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   @Override
   public GroupAggregateByEqualsMatcher<B, MV, AV> cloneMe()
   {

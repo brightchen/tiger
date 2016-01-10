@@ -1,6 +1,6 @@
 package cg.dimension.model.matcher;
 
-public class EqualsMatcher<EV, V> implements Matcher<V>
+public class EqualsMatcher<EV, V> implements TypicalMatcherSpec<EqualsMatcher<EV, V>, EV, V>
 {
   protected EV expectedValue;
   
@@ -25,6 +25,18 @@ public class EqualsMatcher<EV, V> implements Matcher<V>
   public void setExpectedValue(EV expectedValue)
   {
     this.expectedValue = expectedValue;
+  }
+
+  @Override
+  public EqualsMatcher<EV, V> cloneMe()
+  {
+    return new EqualsMatcher<EV, V>(expectedValue);
+  }
+
+  @Override
+  public void injectExpectValue(EV value)
+  {
+    expectedValue = value;
   }
 
   
