@@ -2,6 +2,7 @@ package cg.dimension;
 
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -11,15 +12,21 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Maps;
 
+import cg.common.general.Pair;
+import cg.dimension.group.DefaultBeanMatcherDynamicGroup;
 import cg.dimension.group.DefaultGroupAggregate;
 import cg.dimension.group.Group;
-import cg.dimension.group.GroupAggregateByEqualsMatcher;
+import cg.dimension.group.GroupAggregateByValueEqualsMatcher;
 import cg.dimension.group.SimpleGroupAggregate;
 import cg.dimension.groupcoll.GroupCollection;
 import cg.dimension.groupcoll.SimpleAutoGenerateGroupChain;
+import cg.dimension.handler.BeanAggregateHandler;
 import cg.dimension.model.aggregate.IncrementalAggregateSum;
 import cg.dimension.model.matcher.EqualsMatcher;
+import cg.dimension.model.matcher.TypicalValueMatcherSpec;
 import cg.dimension.model.property.BeanPropertyValueGenerator;
+import cg.dimension.model.property.DefaultBeanMatcher;
+import cg.dimension.order.Country;
 import cg.dimension.order.OrderDetail;
 import cg.dimension.order.OrderDetailGenerator;
 import junit.framework.Assert;
@@ -39,13 +46,8 @@ public class OrderDimensionTester
   
   protected int COUNT = 1000;
   
+
   @Test
-  public void test()
-  {
-    //testSumOfProductsGroupByZipAndCountry();
-    testSumOfProductsGroupByZipOptimized();
-  }
-  
   public void testSumOfProductsGroupByZip()
   {
     //DefaultAggregatorChain<OrderDetail> chain = new DefaultAggregatorChain<>();
@@ -54,7 +56,7 @@ public class OrderDimensionTester
     BeanPropertyValueGenerator<OrderDetail, String> zipGenerator = new BeanPropertyValueGenerator<>(OrderDetail.class, "customer.zip", String.class);
     BeanPropertyValueGenerator<OrderDetail, Integer> productSizeGenerator = new BeanPropertyValueGenerator<>(OrderDetail.class, "productSize", Integer.class);
     IncrementalAggregateSum<Integer> aggregateSum = new IncrementalAggregateSum<Integer>();
-    GroupAggregateByEqualsMatcher<OrderDetail, String, Integer> zipGroupAggregate = GroupAggregateByEqualsMatcher.<OrderDetail, String, Integer>create();
+    GroupAggregateByValueEqualsMatcher<OrderDetail, String, Integer> zipGroupAggregate = GroupAggregateByValueEqualsMatcher.<OrderDetail, String, Integer>create();
     zipGroupAggregate.withMatchPropertyValueGenerator(zipGenerator);
     zipGroupAggregate.withAggregatePropertyValueGenerator(productSizeGenerator);
     zipGroupAggregate.withAggregate(aggregateSum);
@@ -97,7 +99,7 @@ public class OrderDimensionTester
     Collection<Group<OrderDetail>> groups = gc.getGroups();
     for(Group<OrderDetail> group : groups)
     {
-      GroupAggregateByEqualsMatcher<OrderDetail, String, Integer> realGroup = (GroupAggregateByEqualsMatcher<OrderDetail, String, Integer>)group;
+      GroupAggregateByValueEqualsMatcher<OrderDetail, String, Integer> realGroup = (GroupAggregateByValueEqualsMatcher<OrderDetail, String, Integer>)group;
       
       @SuppressWarnings("unchecked")
       String zip = ((EqualsMatcher<String, String>)realGroup.getMatcher()).getExpectedValue();
@@ -107,14 +109,7 @@ public class OrderDimensionTester
       actualProductToSum.put(zip, count);
     }
     
-    Assert.assertTrue("actual size: " + actualProductToSum.size() + ", expected size: " + expectZipToProductSum.size(), 
-        actualProductToSum.size() == expectZipToProductSum.size());
-    Set<String> zipSet = actualProductToSum.keySet();
-    for(String zip : zipSet)
-    {
-      Assert.assertTrue("zip: " + zip + "; actual sum: " + actualProductToSum.get(zip) + "; exected sum: " + expectZipToProductSum.get(zip), 
-          actualProductToSum.get(zip).equals(expectZipToProductSum.get(zip)) );
-    }
+    verifyResult(actualProductToSum, expectZipToProductSum);
   }
   
   
@@ -122,6 +117,7 @@ public class OrderDimensionTester
   /**
    * use optimized way to implement sum of products group by zip
    */
+  @Test
   public void testSumOfProductsGroupByZipOptimized()
   {
     SimpleGroupAggregate<EqualsMatcher<String,String>, OrderDetail, String, Integer> groupAggregate = new SimpleGroupAggregate<>();
@@ -178,37 +174,42 @@ public class OrderDimensionTester
       actualProductToSum.put(zip, count);
     }
     
-    Assert.assertTrue("actual size: " + actualProductToSum.size() + ", expected size: " + expectZipToProductSum.size(), 
-        actualProductToSum.size() == expectZipToProductSum.size());
-    Set<String> zipSet = actualProductToSum.keySet();
+    verifyResult(actualProductToSum, expectZipToProductSum);
+  }
+  
+  public void verifyResult(Map<String, Integer> actualResult, Map<String, Integer> expectResult)
+  {
+    Assert.assertTrue("actual size: " + actualResult.size() + ", expected size: " + expectResult.size(), 
+        actualResult.size() == expectResult.size());
+    Set<String> zipSet = actualResult.keySet();
     for(String zip : zipSet)
     {
-      Assert.assertTrue("zip: " + zip + "; actual sum: " + actualProductToSum.get(zip) + "; exected sum: " + expectZipToProductSum.get(zip), 
-          actualProductToSum.get(zip).equals(expectZipToProductSum.get(zip)) );
+      Assert.assertTrue("zip: " + zip + "; actual sum: " + actualResult.get(zip) + "; exected sum: " + expectResult.get(zip), 
+          actualResult.get(zip).equals(expectResult.get(zip)) );
     }
   }
   
   
-  
+  @Test
   public void testSumOfProductsGroupByZipAndCountry()
   {
-    //DefaultAggregatorChain<OrderDetail> chain = new DefaultAggregatorChain<>();
-    
-    //- sum of products group by zip and country
-    BeanPropertyValueGenerator<OrderDetail, String> zipGenerator = new BeanPropertyValueGenerator<>(OrderDetail.class, "customer.zip", String.class);
+    DefaultBeanMatcher<OrderDetail> beanMatcher = new DefaultBeanMatcher<>();
+    beanMatcher.addMatcherInfo(OrderDetail.class, "customer.zip", String.class, new EqualsMatcher<String, String>());
+    beanMatcher.addMatcherInfo(OrderDetail.class, "customer.country", Country.class, new EqualsMatcher<String, Country>());
+
+    DefaultBeanMatcherDynamicGroup<DefaultBeanMatcher<OrderDetail>, OrderDetail, Integer> countryZipGroup = new DefaultBeanMatcherDynamicGroup<>();
     BeanPropertyValueGenerator<OrderDetail, Integer> productSizeGenerator = new BeanPropertyValueGenerator<>(OrderDetail.class, "productSize", Integer.class);
-    IncrementalAggregateSum<Integer> aggregateSum = new IncrementalAggregateSum<Integer>();
-    //TODO: should use add matcher
-    GroupAggregateByEqualsMatcher<OrderDetail, String, Integer> zipGroupAggregate = GroupAggregateByEqualsMatcher.<OrderDetail, String, Integer>create();
-    zipGroupAggregate.withMatchPropertyValueGenerator(zipGenerator);
-    zipGroupAggregate.withAggregatePropertyValueGenerator(productSizeGenerator);
-    zipGroupAggregate.withAggregate(aggregateSum);
-   
+    countryZipGroup.withBeanHandler(new BeanAggregateHandler<OrderDetail, Integer>()
+                           .withAggregate(new IncrementalAggregateSum<Integer>())
+                           .withAggregateValueGenerator(productSizeGenerator)).withMatchTemplate(beanMatcher);
+                           
+                           
+    
     
     SimpleAutoGenerateGroupChain<OrderDetail> gc = new SimpleAutoGenerateGroupChain<OrderDetail>();
-    gc.setTemplate(zipGroupAggregate);
+    gc.setTemplate(countryZipGroup);
     
-    Map<String, Integer> expectZipToProductSum = Maps.newHashMap();
+    Map<String, Integer> expectCountryZipToProductSum = Maps.newHashMap();
     
     long beginTime = Calendar.getInstance().getTimeInMillis();
     OrderDetailGenerator generator = new OrderDetailGenerator();
@@ -221,44 +222,49 @@ public class OrderDimensionTester
       {
         //generate actual result;
         String zip = od.customer.zip;
+        String country = od.customer.country.name();
         int productSize = od.getProductSize();
-        Integer productSum = expectZipToProductSum.get(zip);
+        String country_zip = country + "_" + zip;
+        Integer productSum = expectCountryZipToProductSum.get(country_zip);
         if(productSum == null)
         {
-          expectZipToProductSum.put(zip, productSize);
+          expectCountryZipToProductSum.put(country_zip, productSize);
         }
         else
         {
-          expectZipToProductSum.put(zip, productSum+productSize);
+          expectCountryZipToProductSum.put(country_zip, productSum+productSize);
         }
       }
     }
     long endTime = Calendar.getInstance().getTimeInMillis();
     
-    logger.info("records {}; value is {}; took {} milliseconds", COUNT, zipGroupAggregate.getAggregate().getValue(), endTime - beginTime);
     
     //verify
     Map<String, Integer> actualProductToSum = Maps.newHashMap();
     Collection<Group<OrderDetail>> groups = gc.getGroups();
     for(Group<OrderDetail> group : groups)
     {
-      GroupAggregateByEqualsMatcher<OrderDetail, String, Integer> realGroup = (GroupAggregateByEqualsMatcher<OrderDetail, String, Integer>)group;
+      DefaultBeanMatcherDynamicGroup<DefaultBeanMatcher<OrderDetail>, OrderDetail, Integer> realGroup = (DefaultBeanMatcherDynamicGroup<DefaultBeanMatcher<OrderDetail>, OrderDetail, Integer>)group;
       
-      @SuppressWarnings("unchecked")
-      String zip = ((EqualsMatcher<String, String>)realGroup.getMatcher()).getExpectedValue();
+      DefaultBeanMatcher<OrderDetail> matcher = (DefaultBeanMatcher<OrderDetail>)realGroup.getMatcher();
       
-      int count = realGroup.getAggregate().getValue();
+      List<Pair<BeanPropertyValueGenerator<OrderDetail, Object>, TypicalValueMatcherSpec<?, Object, Object>>> matcherInfos = matcher.getMatcherInfos();
+      String country_zip = "";
+      {
+        Pair<BeanPropertyValueGenerator<OrderDetail, Object>, TypicalValueMatcherSpec<?, Object, Object>> pair = matcherInfos.get(1);
+        country_zip += ((EqualsMatcher)pair.getRight()).getExpectedValue();
+      }
+      {
+        Pair<BeanPropertyValueGenerator<OrderDetail, Object>, TypicalValueMatcherSpec<?, Object, Object>> pair = matcherInfos.get(0);
+        country_zip += "_";
+        country_zip += ((EqualsMatcher)pair.getRight()).getExpectedValue();
+      }
       
-      actualProductToSum.put(zip, count);
+      int count = (Integer)((BeanAggregateHandler)realGroup.getBeanHandler()).getAggregate().getValue();
+      
+      actualProductToSum.put(country_zip, count);
     }
     
-    Assert.assertTrue("actual size: " + actualProductToSum.size() + ", expected size: " + expectZipToProductSum.size(), 
-        actualProductToSum.size() == expectZipToProductSum.size());
-    Set<String> zipSet = actualProductToSum.keySet();
-    for(String zip : zipSet)
-    {
-      Assert.assertTrue("zip: " + zip + "; actual sum: " + actualProductToSum.get(zip) + "; exected sum: " + expectZipToProductSum.get(zip), 
-          actualProductToSum.get(zip).equals(expectZipToProductSum.get(zip)) );
-    }
+    this.verifyResult(actualProductToSum, expectCountryZipToProductSum);
   }
 }

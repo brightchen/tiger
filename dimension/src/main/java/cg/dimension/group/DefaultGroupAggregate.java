@@ -3,10 +3,13 @@ package cg.dimension.group;
 import cg.dimension.model.aggregate.Aggregate;
 import cg.dimension.model.aggregate.CloneableAggregate;
 import cg.dimension.model.matcher.MatcherValueMapper;
-import cg.dimension.model.matcher.TypicalMatcherSpec;
+import cg.dimension.model.matcher.TypicalValueMatcherSpec;
 
 /**
  * DefaultGroupAggregate create new matcher by clone from the template and inject the value 
+ * When a new bean come, match it with group, if can't match, create a new group and inject the value to it. 
+ * the group create the match according the template and value.
+ * 
  * @author bright
  *
  * @param <M> The class of Matcher for clone
@@ -15,13 +18,13 @@ import cg.dimension.model.matcher.TypicalMatcherSpec;
  * @param <MV>
  * @param <AV>
  */
-public class DefaultGroupAggregate<M extends TypicalMatcherSpec<M, EV, MV>, EV, B, MV, AV extends Number> 
-    extends AbstractGroupAggregate<DefaultGroupAggregate<M, EV, B, MV, AV>, B, MV, AV>
+public class DefaultGroupAggregate<M extends TypicalValueMatcherSpec<M, EV, MV>, EV, B, MV, AV extends Number> 
+    extends AbstractValueMatcherDynamicGroupAggregate<DefaultGroupAggregate<M, EV, B, MV, AV>, B, MV, AV>
 {
-  protected TypicalMatcherSpec<M, EV, MV> matcherTemplate;
+  protected TypicalValueMatcherSpec<M, EV, MV> matcherTemplate;
   protected MatcherValueMapper<MV, EV> matcherValueMapper;
   
-  public DefaultGroupAggregate<M, EV, B, MV, AV> withMatcherTemplate(TypicalMatcherSpec<M, EV, MV> matcherTemplate)
+  public DefaultGroupAggregate<M, EV, B, MV, AV> withMatcherTemplate(TypicalValueMatcherSpec<M, EV, MV> matcherTemplate)
   {
     this.matcherTemplate = matcherTemplate;
     return this;

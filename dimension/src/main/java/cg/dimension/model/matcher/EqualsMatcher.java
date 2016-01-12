@@ -1,6 +1,6 @@
 package cg.dimension.model.matcher;
 
-public class EqualsMatcher<EV, V> implements TypicalMatcherSpec<EqualsMatcher<EV, V>, EV, V>
+public class EqualsMatcher<EV, V> implements TypicalValueMatcherSpec<EqualsMatcher<EV, V>, EV, V>
 {
   protected EV expectedValue;
   
