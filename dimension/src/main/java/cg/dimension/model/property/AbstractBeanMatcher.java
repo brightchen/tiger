@@ -5,10 +5,8 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 import cg.common.general.Pair;
-import cg.dimension.model.matcher.CloneableMatcher;
 import cg.dimension.model.matcher.Matcher;
 import cg.dimension.model.matcher.TypicalValueMatcherSpec;
-import cg.dimension.order.OrderDetail;
 
 /**
  * This class provide method to evaluate if a bean match this matcher

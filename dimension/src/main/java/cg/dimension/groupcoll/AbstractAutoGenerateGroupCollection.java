@@ -5,37 +5,35 @@ import cg.dimension.group.Group;
 import cg.dimension.group.GroupCloneFactory;
 
 /**
- * The SimpleAutoGenerateGroupChain automatically generate groups by group factory.
+ * The AbstractAutoGenerateGroupCollection automatically generate groups by group factory.
  * The GroupCloneFactory create new group by clone the template group.
  * 
  * @author bright
  *
  * @param <B>
  */
-public class SimpleAutoGenerateGroupChain<B> extends AbstractGroupChain<B>
+public abstract class AbstractAutoGenerateGroupCollection<B> implements GroupCollection<B>
 {
   protected GroupCloneFactory<B> groupFactory = new GroupCloneFactory<>();
-  
-  public SimpleAutoGenerateGroupChain()
-  {
-    this.initGroups();
-  }
   
   @Override
   public boolean put(B bean)
   {
-    for(Group<B> group : groups)
-    {
-      if(group.put(bean))
-        return true;
-    }
+    if(putToExistingGroups(bean))
+      return true;
     
     //create a group for this bean
     Group<B> group = groupFactory.createGroup();
     group.put(bean);
     
-    return groups.add(group);
+    return true;
   }
+  
+  /**
+   * @param bean
+   * @return true if successful put to existing groups, else return false
+   */
+  protected abstract boolean putToExistingGroups(B bean);
   
   public void setTemplate(CloneableGroup<? extends Group<B>, B> template)
   {

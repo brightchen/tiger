@@ -49,8 +49,8 @@ public class OrderDimensionTester
 {
   private static final Logger logger = LoggerFactory.getLogger(OrderDimensionTester.class);
   private static final int SLEEP_TIME = 0;
-  
-  protected int COUNT = 1000;
+  private static boolean wantVerify = true;
+  protected int COUNT = 100000;
   
 
   @Test
@@ -78,9 +78,8 @@ public class OrderDimensionTester
     for(int i=0; i<COUNT; ++i)
     {
       OrderDetail od = generator.generate();
-      //zipGroupAggregate.put(od);
       gc.put(od);
-      
+      if(wantVerify)
       {
         //generate actual result;
         String zip = od.customer.zip;
@@ -101,21 +100,24 @@ public class OrderDimensionTester
     logger.info("records {}; value is {}; took {} milliseconds", COUNT, zipGroupAggregate.getAggregate().getValue(), endTime - beginTime);
     
     //verify
-    Map<String, Integer> actualProductToSum = Maps.newHashMap();
-    Collection<Group<OrderDetail>> groups = gc.getGroups();
-    for(Group<OrderDetail> group : groups)
+    if(wantVerify)
     {
-      GroupAggregateByValueEqualsMatcher<OrderDetail, String, Integer> realGroup = (GroupAggregateByValueEqualsMatcher<OrderDetail, String, Integer>)group;
+      Map<String, Integer> actualProductToSum = Maps.newHashMap();
+      Collection<Group<OrderDetail>> groups = gc.getGroups();
+      for(Group<OrderDetail> group : groups)
+      {
+        GroupAggregateByValueEqualsMatcher<OrderDetail, String, Integer> realGroup = (GroupAggregateByValueEqualsMatcher<OrderDetail, String, Integer>)group;
+        
+        @SuppressWarnings("unchecked")
+        String zip = ((EqualsMatcher<String, String>)realGroup.getMatcher()).getExpectedValue();
+        
+        int count = realGroup.getAggregate().getValue();
+        
+        actualProductToSum.put(zip, count);
+      }
       
-      @SuppressWarnings("unchecked")
-      String zip = ((EqualsMatcher<String, String>)realGroup.getMatcher()).getExpectedValue();
-      
-      int count = realGroup.getAggregate().getValue();
-      
-      actualProductToSum.put(zip, count);
+      verifyResult(actualProductToSum, expectZipToProductSum);
     }
-    
-    verifyResult(actualProductToSum, expectZipToProductSum);
   }
   
   
@@ -144,9 +146,9 @@ public class OrderDimensionTester
     for(int i=0; i<COUNT; ++i)
     {
       OrderDetail od = generator.generate();
-      logger.debug("(zip, product-size) : ({}, {})", od.customer.zip, od.products.size());
+      //logger.debug("(zip, product-size) : ({}, {})", od.customer.zip, od.products.size());
       groupChain.put(od);
-      
+      if(wantVerify)
       {
         //generate actual result;
         String zip = od.customer.zip;
@@ -164,23 +166,26 @@ public class OrderDimensionTester
     }
     long endTime = Calendar.getInstance().getTimeInMillis();
     
-    //verify
-    Map<String, Integer> actualProductToSum = Maps.newHashMap();
-    Collection<Group<OrderDetail>> groups = groupChain.getGroups();
-    for(Group<OrderDetail> group : groups)
+    if(wantVerify)
     {
-      @SuppressWarnings("unchecked")
-      SimpleGroupAggregate<EqualsMatcher<String,String>, OrderDetail, String, Integer> realGroup = (SimpleGroupAggregate<EqualsMatcher<String,String>, OrderDetail, String, Integer>)group;
+      //verify
+      Map<String, Integer> actualProductToSum = Maps.newHashMap();
+      Collection<Group<OrderDetail>> groups = groupChain.getGroups();
+      for(Group<OrderDetail> group : groups)
+      {
+        @SuppressWarnings("unchecked")
+        SimpleGroupAggregate<EqualsMatcher<String,String>, OrderDetail, String, Integer> realGroup = (SimpleGroupAggregate<EqualsMatcher<String,String>, OrderDetail, String, Integer>)group;
+        
+        @SuppressWarnings("unchecked")
+        String zip = ((EqualsMatcher<String, String>)realGroup.getMatcher()).getExpectedValue();
+        
+        int count = realGroup.getAggregate().getValue();
+        
+        actualProductToSum.put(zip, count);
+      }
       
-      @SuppressWarnings("unchecked")
-      String zip = ((EqualsMatcher<String, String>)realGroup.getMatcher()).getExpectedValue();
-      
-      int count = realGroup.getAggregate().getValue();
-      
-      actualProductToSum.put(zip, count);
+      verifyResult(actualProductToSum, expectZipToProductSum);
     }
-    
-    verifyResult(actualProductToSum, expectZipToProductSum);
   }
   
   public <K, V> void verifyResult(Map<K, V> actualResult, Map<K, V> expectResult)
@@ -222,6 +227,7 @@ public class OrderDimensionTester
       //zipGroupAggregate.put(od);
       gc.put(od);
       
+      if(wantVerify)
       {
         //generate actual result;
         String zip = od.customer.zip;
@@ -241,34 +247,36 @@ public class OrderDimensionTester
     }
     long endTime = Calendar.getInstance().getTimeInMillis();
     
-    
-    //verify
-    Map<String, Integer> actualProductToSum = Maps.newHashMap();
-    Collection<Group<OrderDetail>> groups = gc.getGroups();
-    for(Group<OrderDetail> group : groups)
+    if(wantVerify)
     {
-      DefaultBeanMatcherDynamicGroup<DefaultBeanMatcher<OrderDetail>, OrderDetail, Integer> realGroup = (DefaultBeanMatcherDynamicGroup<DefaultBeanMatcher<OrderDetail>, OrderDetail, Integer>)group;
-      
-      DefaultBeanMatcher<OrderDetail> matcher = (DefaultBeanMatcher<OrderDetail>)realGroup.getMatcher();
-      
-      List<Pair<BeanPropertyValueGenerator<OrderDetail, Object>, TypicalValueMatcherSpec<?, Object, Object>>> matcherInfos = matcher.getMatcherInfos();
-      String country_zip = "";
+      //verify
+      Map<String, Integer> actualProductToSum = Maps.newHashMap();
+      Collection<Group<OrderDetail>> groups = gc.getGroups();
+      for(Group<OrderDetail> group : groups)
       {
-        Pair<BeanPropertyValueGenerator<OrderDetail, Object>, TypicalValueMatcherSpec<?, Object, Object>> pair = matcherInfos.get(1);
-        country_zip += ((EqualsMatcher)pair.getRight()).getExpectedValue();
-      }
-      {
-        Pair<BeanPropertyValueGenerator<OrderDetail, Object>, TypicalValueMatcherSpec<?, Object, Object>> pair = matcherInfos.get(0);
-        country_zip += "_";
-        country_zip += ((EqualsMatcher)pair.getRight()).getExpectedValue();
+        DefaultBeanMatcherDynamicGroup<DefaultBeanMatcher<OrderDetail>, OrderDetail, Integer> realGroup = (DefaultBeanMatcherDynamicGroup<DefaultBeanMatcher<OrderDetail>, OrderDetail, Integer>)group;
+        
+        DefaultBeanMatcher<OrderDetail> matcher = (DefaultBeanMatcher<OrderDetail>)realGroup.getMatcher();
+        
+        List<Pair<BeanPropertyValueGenerator<OrderDetail, Object>, TypicalValueMatcherSpec<?, Object, Object>>> matcherInfos = matcher.getMatcherInfos();
+        String country_zip = "";
+        {
+          Pair<BeanPropertyValueGenerator<OrderDetail, Object>, TypicalValueMatcherSpec<?, Object, Object>> pair = matcherInfos.get(1);
+          country_zip += ((EqualsMatcher)pair.getRight()).getExpectedValue();
+        }
+        {
+          Pair<BeanPropertyValueGenerator<OrderDetail, Object>, TypicalValueMatcherSpec<?, Object, Object>> pair = matcherInfos.get(0);
+          country_zip += "_";
+          country_zip += ((EqualsMatcher)pair.getRight()).getExpectedValue();
+        }
+        
+        int count = (Integer)((BeanAggregateHandler)realGroup.getBeanHandler()).getAggregate().getValue();
+        
+        actualProductToSum.put(country_zip, count);
       }
       
-      int count = (Integer)((BeanAggregateHandler)realGroup.getBeanHandler()).getAggregate().getValue();
-      
-      actualProductToSum.put(country_zip, count);
+      this.verifyResult(actualProductToSum, expectCountryZipToProductSum);
     }
-    
-    this.verifyResult(actualProductToSum, expectCountryZipToProductSum);
   }
   
   
@@ -294,9 +302,10 @@ public class OrderDimensionTester
     for(int i=0; i<COUNT; ++i)
     {
       OrderDetail od = generator.generate();
-      logger.debug("(zip, product-size) : ({}, {})", od.customer.zip, od.products.size());
+      //logger.debug("(zip, product-size) : ({}, {})", od.customer.zip, od.products.size());
       groupChain.put(od);
       
+      if(wantVerify)
       {
         //generate actual result;
         long orderTime = od.orderInfo.orderTime;
@@ -318,22 +327,25 @@ public class OrderDimensionTester
     }
     long endTime = Calendar.getInstance().getTimeInMillis();
     
-    //verify
-    Map<Range<Long>, Integer> actualProductToSum = Maps.newHashMap();
-    Collection<Group<OrderDetail>> groups = groupChain.getGroups();
-    for(Group<OrderDetail> group : groups)
+    if(wantVerify)
     {
-      @SuppressWarnings("unchecked")
-      DefaultGroupAggregate<RangeMatcher<Long>, Range<Long>, OrderDetail, Long, Integer> realGroupAggregate = (DefaultGroupAggregate<RangeMatcher<Long>, Range<Long>, OrderDetail, Long, Integer>)group;
+      //verify
+      Map<Range<Long>, Integer> actualProductToSum = Maps.newHashMap();
+      Collection<Group<OrderDetail>> groups = groupChain.getGroups();
+      for(Group<OrderDetail> group : groups)
+      {
+        @SuppressWarnings("unchecked")
+        DefaultGroupAggregate<RangeMatcher<Long>, Range<Long>, OrderDetail, Long, Integer> realGroupAggregate = (DefaultGroupAggregate<RangeMatcher<Long>, Range<Long>, OrderDetail, Long, Integer>)group;
+        
+        @SuppressWarnings("unchecked")
+        Range<Long> timeRange = ((RangeMatcher<Long>)realGroupAggregate.getMatcher()).getRange();
+        
+        int count = realGroupAggregate.getAggregate().getValue();
+        
+        actualProductToSum.put(timeRange, count);
+      }
       
-      @SuppressWarnings("unchecked")
-      Range<Long> timeRange = ((RangeMatcher<Long>)realGroupAggregate.getMatcher()).getRange();
-      
-      int count = realGroupAggregate.getAggregate().getValue();
-      
-      actualProductToSum.put(timeRange, count);
+      verifyResult(actualProductToSum, expectTimeRangeToProductSum);
     }
-    
-    verifyResult(actualProductToSum, expectTimeRangeToProductSum);
   }
 }
