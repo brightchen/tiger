@@ -10,19 +10,25 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.MapDifference;
 import com.google.common.collect.Maps;
 
 import cg.common.general.Pair;
+import cg.common.generate.Range;
 import cg.dimension.group.DefaultBeanMatcherDynamicGroup;
 import cg.dimension.group.DefaultGroupAggregate;
 import cg.dimension.group.Group;
 import cg.dimension.group.GroupAggregateByValueEqualsMatcher;
 import cg.dimension.group.SimpleGroupAggregate;
+import cg.dimension.group.TimeRangeGroupAggregate;
 import cg.dimension.groupcoll.GroupCollection;
 import cg.dimension.groupcoll.SimpleAutoGenerateGroupChain;
 import cg.dimension.handler.BeanAggregateHandler;
 import cg.dimension.model.aggregate.IncrementalAggregateSum;
 import cg.dimension.model.matcher.EqualsMatcher;
+import cg.dimension.model.matcher.MatcherTimeRangeMapper;
+import cg.dimension.model.matcher.MatcherTimeRangeMapper.TimeRangePolicy;
+import cg.dimension.model.matcher.RangeMatcher;
 import cg.dimension.model.matcher.TypicalValueMatcherSpec;
 import cg.dimension.model.property.BeanPropertyValueGenerator;
 import cg.dimension.model.property.DefaultBeanMatcher;
@@ -177,16 +183,13 @@ public class OrderDimensionTester
     verifyResult(actualProductToSum, expectZipToProductSum);
   }
   
-  public void verifyResult(Map<String, Integer> actualResult, Map<String, Integer> expectResult)
+  public <K, V> void verifyResult(Map<K, V> actualResult, Map<K, V> expectResult)
   {
     Assert.assertTrue("actual size: " + actualResult.size() + ", expected size: " + expectResult.size(), 
         actualResult.size() == expectResult.size());
-    Set<String> zipSet = actualResult.keySet();
-    for(String zip : zipSet)
-    {
-      Assert.assertTrue("zip: " + zip + "; actual sum: " + actualResult.get(zip) + "; exected sum: " + expectResult.get(zip), 
-          actualResult.get(zip).equals(expectResult.get(zip)) );
-    }
+    
+    MapDifference<K, V> difference = Maps.difference(actualResult, expectResult);
+    Assert.assertTrue(difference.toString(), difference.areEqual());
   }
   
   
@@ -266,5 +269,71 @@ public class OrderDimensionTester
     }
     
     this.verifyResult(actualProductToSum, expectCountryZipToProductSum);
+  }
+  
+  
+  @Test
+  public void testSumOfProductsGroupByTimeRange()
+  {
+    DefaultGroupAggregate<RangeMatcher<Long>, Range<Long>, OrderDetail, Long, Integer> groupAggregate = new DefaultGroupAggregate<>();
+    groupAggregate.withAggregate(new IncrementalAggregateSum<Integer>());
+    groupAggregate.withMatcherTemplate(new RangeMatcher<Long>());
+    groupAggregate.withMatcherValueMapper(new MatcherTimeRangeMapper().withTimeRangePolicy(TimeRangePolicy.PER_SECOND));
+    BeanPropertyValueGenerator<OrderDetail, Long> timeGenerator = new BeanPropertyValueGenerator<>(OrderDetail.class, "orderInfo.orderTime", Long.class);
+    groupAggregate.withMatchPropertyValueGenerator(timeGenerator);
+    BeanPropertyValueGenerator<OrderDetail, Integer> productSizeGenerator = new BeanPropertyValueGenerator<>(OrderDetail.class, "productSize", Integer.class);
+    groupAggregate.withAggregatePropertyValueGenerator(productSizeGenerator);
+    
+    SimpleAutoGenerateGroupChain<OrderDetail> groupChain = new SimpleAutoGenerateGroupChain<>();
+    groupChain.setTemplate(groupAggregate);
+    
+    Map<Range<Long>, Integer> expectTimeRangeToProductSum = Maps.newHashMap();
+    
+    long beginTime = Calendar.getInstance().getTimeInMillis();
+    OrderDetailGenerator generator = new OrderDetailGenerator();
+    for(int i=0; i<COUNT; ++i)
+    {
+      OrderDetail od = generator.generate();
+      logger.debug("(zip, product-size) : ({}, {})", od.customer.zip, od.products.size());
+      groupChain.put(od);
+      
+      {
+        //generate actual result;
+        long orderTime = od.orderInfo.orderTime;
+        int productSize = od.getProductSize();
+        
+        long startValue = orderTime - orderTime % (1000);
+        Range<Long> timeRange = new Range<Long>(startValue, startValue+1000);
+        
+        Integer productSum = expectTimeRangeToProductSum.get(timeRange);
+        if(productSum == null)
+        {
+          expectTimeRangeToProductSum.put(timeRange, productSize);
+        }
+        else
+        {
+          expectTimeRangeToProductSum.put(timeRange, productSum+productSize);
+        }
+      }
+    }
+    long endTime = Calendar.getInstance().getTimeInMillis();
+    
+    //verify
+    Map<Range<Long>, Integer> actualProductToSum = Maps.newHashMap();
+    Collection<Group<OrderDetail>> groups = groupChain.getGroups();
+    for(Group<OrderDetail> group : groups)
+    {
+      @SuppressWarnings("unchecked")
+      DefaultGroupAggregate<RangeMatcher<Long>, Range<Long>, OrderDetail, Long, Integer> realGroupAggregate = (DefaultGroupAggregate<RangeMatcher<Long>, Range<Long>, OrderDetail, Long, Integer>)group;
+      
+      @SuppressWarnings("unchecked")
+      Range<Long> timeRange = ((RangeMatcher<Long>)realGroupAggregate.getMatcher()).getRange();
+      
+      int count = realGroupAggregate.getAggregate().getValue();
+      
+      actualProductToSum.put(timeRange, count);
+    }
+    
+    verifyResult(actualProductToSum, expectTimeRangeToProductSum);
   }
 }

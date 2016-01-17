@@ -1,8 +1,8 @@
 package cg.dimension.model.matcher;
 
-import cg.dimension.model.Range;
+import cg.common.generate.Range;
 
-public class RangeMatcher<V> implements Matcher<V>
+public class RangeMatcher<V> implements TypicalValueMatcherSpec<RangeMatcher<V>, Range<V>, V>
 {
   protected Range<V> range;
   
@@ -11,6 +11,18 @@ public class RangeMatcher<V> implements Matcher<V>
   public RangeMatcher(Range<V> range)
   {
     this.setRange(range);
+  }
+  
+  public RangeMatcher<V> withRange(Range<V> range)
+  {
+    this.setRange(range);
+    return this;
+  }
+  
+  public RangeMatcher<V> withRange(V rangeFrom, V rangeTo)
+  {
+    this.setRange(new Range<V>(rangeFrom, rangeTo));
+    return this;
   }
   
   //@Override
@@ -27,5 +39,17 @@ public class RangeMatcher<V> implements Matcher<V>
   public void setRange(Range<V> range)
   {
     this.range = range;
+  }
+
+  @Override
+  public RangeMatcher<V> cloneMe()
+  {
+    return new RangeMatcher<V>(range);
+  }
+
+  @Override
+  public void injectExpectValue(Range<V> value)
+  {
+    this.range = value;
   }
 }

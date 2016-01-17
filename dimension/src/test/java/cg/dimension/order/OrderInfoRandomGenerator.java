@@ -37,8 +37,9 @@ public class OrderInfoRandomGenerator implements BeanGenerator<OrderInfo>
   public OrderInfo generate()
   {
     OrderInfo oi = new OrderInfo();
-    oi.orderTime = orderTimeRange.from;
-    oi.orderTime.add(Calendar.MILLISECOND, RandomHolder.random.nextInt(orderTimeLength));
+    Calendar c = orderTimeRange.from;
+    c.add(Calendar.MILLISECOND, RandomHolder.random.nextInt(orderTimeLength));
+    oi.orderTime = c.getTimeInMillis();
     oi.payMethod = payMethodGenerator.generate();
     return oi;
   }

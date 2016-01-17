@@ -1,6 +1,6 @@
 package cg.dimension.aggregator;
 
-import cg.dimension.model.Range;
+import cg.common.generate.Range;
 import cg.dimension.model.aggregate.Aggregate;
 import cg.dimension.model.criteria.PropertyCriteria;
 import cg.dimension.model.matcher.RangeMatcher;

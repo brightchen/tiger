@@ -1,6 +1,6 @@
 package cg.dimension.model.criteria;
 
-import cg.dimension.model.Range;
+import cg.common.generate.Range;
 
 public class RangeCriteria<T> //implements Criteria<T>
 {
