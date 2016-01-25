@@ -27,9 +27,9 @@ import cg.dimension.model.property.BeanPropertyValueGenerator;
  */
 public class AggregatorMapIntegrator<B> implements AggregatorCollection<B>
 {
-  protected Map<String, Aggregator<B, ?, ? extends Number>> aggregatorMap = Maps.newHashMap();
+  protected Map<String, Aggregator<B, ?, ? extends Number, ?>> aggregatorMap = Maps.newHashMap();
   //use this structure the share the criteria and BeanPropertyValueGenerator to avoid duplicate computation
-  protected Map<PropertyCriteria<B, Object>, Set<BeanPropertyValueGenerator<B, Object>>> criteriaToMatchValueGenerator = Maps.newHashMap();
+  protected Map<PropertyCriteria<B, Object, Object>, Set<BeanPropertyValueGenerator<B, Object>>> criteriaToMatchValueGenerator = Maps.newHashMap();
   protected Map<BeanPropertyValueGenerator<B, Number>, Set<Aggregate<Number>>> aggregateValueGeneratorToAggregate = Maps.newHashMap();
   
   public AggregatorMapIntegrator()
@@ -44,7 +44,7 @@ public class AggregatorMapIntegrator<B> implements AggregatorCollection<B>
    * @param aggregateType
    * @return Aggregator in order to get value.
    */
-  public <MV, AV extends Number> Aggregator<B, MV, AV> addAggregator(String name, PropertyCriteria<B, MV> criteria, 
+  public <MV, AV extends Number, K> Aggregator<B, MV, AV, K> addAggregator(String name, PropertyCriteria<B, MV, K> criteria, 
       BeanPropertyValueGenerator<B, MV> matchValueGenerator, 
       BeanPropertyValueGenerator<B, AV> aggregateValueGenerator,
       Class<AV> aggregateValueType, AggregateType aggregateType)
@@ -57,7 +57,7 @@ public class AggregatorMapIntegrator<B> implements AggregatorCollection<B>
     
     if(criteriaToMatchValueGenerator.get(criteria) == null)
     {
-      criteriaToMatchValueGenerator.put((PropertyCriteria<B, Object>)criteria, Sets.<BeanPropertyValueGenerator<B, Object>>newHashSet());
+      criteriaToMatchValueGenerator.put((PropertyCriteria<B, Object, Object>)criteria, Sets.<BeanPropertyValueGenerator<B, Object>>newHashSet());
     }
     criteriaToMatchValueGenerator.get(criteria).add((BeanPropertyValueGenerator<B, Object>)matchValueGenerator);
     
@@ -71,13 +71,13 @@ public class AggregatorMapIntegrator<B> implements AggregatorCollection<B>
     return aggregator;
   }
   
-  public void addAggregator(AssembleAggregator<B, Object, Number> aggregator)
+  public void addAggregator(AssembleAggregator<B, Object, Number, Object> aggregator)
   {
     if(aggregatorMap.get(aggregator.getName()) != null)
       throw new IllegalArgumentException("The aggregate name '" + aggregator.getName() + "' already used.");
     aggregatorMap.put(aggregator.getName(), aggregator);
     
-    PropertyCriteria<B, Object> criteria = aggregator.getCriteria();
+    PropertyCriteria<B, Object, Object> criteria = aggregator.getCriteria();
     if(criteriaToMatchValueGenerator.get(criteria) == null)
     {
       criteriaToMatchValueGenerator.put(criteria, Sets.<BeanPropertyValueGenerator<B, Object>>newHashSet());
@@ -96,7 +96,7 @@ public class AggregatorMapIntegrator<B> implements AggregatorCollection<B>
   @Override
   public void processBean(B bean)
   {
-    for(Map.Entry<PropertyCriteria<B, Object>, Set<BeanPropertyValueGenerator<B, Object>>> criteriaEntry : criteriaToMatchValueGenerator.entrySet())
+    for(Map.Entry<PropertyCriteria<B, Object, Object>, Set<BeanPropertyValueGenerator<B, Object>>> criteriaEntry : criteriaToMatchValueGenerator.entrySet())
     {
       if(!criteriaEntry.getKey().matches(bean))
         continue;

@@ -2,7 +2,7 @@ package cg.dimension.model.matcher;
 
 import cg.common.generate.Range;
 
-public class RangeMatcher<V> implements TypicalValueMatcherSpec<RangeMatcher<V>, Range<V>, V>
+public class RangeMatcher<V extends Comparable<V>> implements TypicalValueMatcherSpec<RangeMatcher<V>, Range<V>, V, Range<V>>
 {
   protected Range<V> range;
   
@@ -51,5 +51,11 @@ public class RangeMatcher<V> implements TypicalValueMatcherSpec<RangeMatcher<V>,
   public void injectExpectValue(Range<V> value)
   {
     this.range = value;
+  }
+
+  @Override
+  public Range<V> getKey()
+  {
+    return range;
   }
 }

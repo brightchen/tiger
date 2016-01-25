@@ -18,10 +18,10 @@ import cg.common.math.Calculator;
  * @author bright
  *
  */
-public class CompositeAggregator<B, MV, AV extends Number> implements Aggregator<B, MV, AV>
+public class CompositeAggregator<B, MV, AV extends Number, K> implements Aggregator<B, MV, AV, K>
 {
   protected String name;
-  protected List<Aggregator<B, MV, AV>> subAggregators = Lists.newArrayList();
+  protected List<Aggregator<B, MV, AV, Object>> subAggregators = Lists.newArrayList();
   protected Class<AV> valueType;
   
   public CompositeAggregator(Class<AV> valueType)
@@ -39,7 +39,7 @@ public class CompositeAggregator<B, MV, AV extends Number> implements Aggregator
   @Override
   public boolean matches(MV value)
   {
-    for(Aggregator<B, MV, AV> subAggregator : subAggregators)
+    for(Aggregator<B, MV, AV, Object> subAggregator : subAggregators)
     {
       if(subAggregator.matches(value))
         return true;
@@ -53,7 +53,7 @@ public class CompositeAggregator<B, MV, AV extends Number> implements Aggregator
     //depends on the aggregate type, for sum and count, add all. 
     //implement add here.
     AV value = Calculator.setValue(valueType, 0.0);
-    for(Aggregator<B, MV, AV> subAggregator : subAggregators)
+    for(Aggregator<B, MV, AV, Object> subAggregator : subAggregators)
     {
       value = Calculator.add(value, subAggregator.getValue());
     }
@@ -82,10 +82,17 @@ public class CompositeAggregator<B, MV, AV extends Number> implements Aggregator
   public void processBean(B bean)
   {
     //let the sub aggregator handle this bean
-    for(Aggregator<B, MV, AV> subAggregator : subAggregators)
+    for(Aggregator<B, MV, AV, Object> subAggregator : subAggregators)
     {
       subAggregator.processBean(bean);
     }
+  }
+
+
+  @Override
+  public K getKey()
+  {
+    throw new IllegalArgumentException("Unsupported Operator.");
   }
 
   public Class<AV> getValueType()

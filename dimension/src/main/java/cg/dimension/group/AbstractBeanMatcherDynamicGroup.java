@@ -3,11 +3,11 @@ package cg.dimension.group;
 import cg.dimension.model.CloneableBean;
 import cg.dimension.model.matcher.Matcher;
 
-public abstract class AbstractBeanMatcherDynamicGroup<T extends CloneableBean<T>, B> implements CloneableGroup<T, B>
+public abstract class AbstractBeanMatcherDynamicGroup<T extends CloneableBean<T>, B, K> implements CloneableGroup<T, B, K>
 {
-  protected Matcher<B> matcher;
+  protected Matcher<B, K> matcher;
   
-  public AbstractBeanMatcherDynamicGroup<T, B> withMatcher(Matcher<B> matcher)
+  public AbstractBeanMatcherDynamicGroup<T, B, K> withMatcher(Matcher<B, K> matcher)
   {
     this.setMatcher(matcher);
     return this;
@@ -32,12 +32,12 @@ public abstract class AbstractBeanMatcherDynamicGroup<T extends CloneableBean<T>
   
   protected abstract void createMatcher(B bean);
 
-  public Matcher<B> getMatcher()
+  public Matcher<B, K> getMatcher()
   {
     return matcher;
   }
 
-  public void setMatcher(Matcher<B> matcher)
+  public void setMatcher(Matcher<B, K> matcher)
   {
     this.matcher = matcher;
   }

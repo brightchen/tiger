@@ -12,14 +12,14 @@ import cg.dimension.model.property.BeanPropertyValueGenerator;
  * @author bright
  *
  */
-public class PropertyCriteria<B, V>
+public class PropertyCriteria<B, V, K>
 {
   protected BeanPropertyValueGenerator<B, V> matchValueGenerator;
-  protected Matcher<V> matcher;
+  protected Matcher<V, K> matcher;
 
   public PropertyCriteria(){}
   
-  public PropertyCriteria(BeanPropertyValueGenerator<B, V> valueProvider, Matcher<V> matcher)
+  public PropertyCriteria(BeanPropertyValueGenerator<B, V> valueProvider, Matcher<V,K> matcher)
   {
     setMatchValueGenerator(valueProvider);
     setMatcher(matcher);
@@ -41,15 +41,14 @@ public class PropertyCriteria<B, V>
     this.matchValueGenerator = matchValueGenerator;
   }
 
-  public Matcher<V> getMatcher()
+  public Matcher<V,K> getMatcher()
   {
     return matcher;
   }
 
-  public void setMatcher(Matcher<V> matcher)
+  public void setMatcher(Matcher<V,K> matcher)
   {
     this.matcher = matcher;
   }
-  
   
 }

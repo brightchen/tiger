@@ -1,10 +1,10 @@
 package cg.dimension.group;
 
-public interface GroupFactory<B>
+public interface GroupFactory<B, K>
 {
   /**
    * create Group
    * @return
    */
-  public Group<B> createGroup();
+  public Group<B, K> createGroup();
 }

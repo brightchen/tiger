@@ -12,7 +12,7 @@ import cg.dimension.model.matcher.TypicalValueMatcherSpec;
  * @param <MV>
  * @param <AV>
  */
-public class SimpleGroupAggregate<M extends TypicalValueMatcherSpec<M, MV, MV>, B, MV, AV extends Number>  
+public class SimpleGroupAggregate<M extends TypicalValueMatcherSpec<M, MV, MV, MV>, B, MV, AV extends Number>  
     extends DefaultGroupAggregate<M, MV, B, MV, AV>
 {
   public SimpleGroupAggregate()

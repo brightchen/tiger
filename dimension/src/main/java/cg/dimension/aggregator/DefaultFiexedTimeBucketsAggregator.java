@@ -1,5 +1,6 @@
 package cg.dimension.aggregator;
 
+import cg.common.generate.Range;
 import cg.dimension.model.aggregate.AggregateFactory;
 import cg.dimension.model.aggregate.CloneableAggregate;
 import cg.dimension.model.property.BeanPropertyValueGenerator;
@@ -13,7 +14,7 @@ import cg.dimension.model.property.BeanPropertyValueGenerator;
  * @param <B>
  * @param <AV>
  */
-public class DefaultFiexedTimeBucketsAggregator<B, AV extends Number> extends AbstractFiexedTimeBucketsAggregator<B, Long, AV>
+public class DefaultFiexedTimeBucketsAggregator<B, AV extends Number, K> extends AbstractFiexedTimeBucketsAggregator<B, Long, AV, K>
 {
   protected BeanPropertyValueGenerator<B, AV> aggregateValueGenerator;    //related to a property (bean/property)
   protected BeanPropertyValueGenerator<B, Long> timeGenerator;
@@ -39,9 +40,10 @@ public class DefaultFiexedTimeBucketsAggregator<B, AV extends Number> extends Ab
   }
 
   @Override
-  protected Aggregator<B, Long, AV> createSubAggregator(long bucketBeginTime, long bucketTimeSpan, int index)
+  protected Aggregator<B, Long, AV, Range<Long>> createSubAggregator(long bucketBeginTime, long bucketTimeSpan, int index)
   {
-    return new TimeBucketAggregator<B, AV>(name, timeGenerator, aggregateValueGenerator , aggregateFactory.createAggregate(), bucketBeginTime, bucketBeginTime + bucketTimeSpan );
+    return new TimeBucketAggregator<B, AV>(name, timeGenerator, aggregateValueGenerator , 
+        aggregateFactory.createAggregate(), bucketBeginTime, bucketBeginTime + bucketTimeSpan );
   }
 
   public BeanPropertyValueGenerator<B, AV> getAggregateValueGenerator()

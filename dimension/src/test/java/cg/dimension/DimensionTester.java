@@ -39,7 +39,7 @@ public class DimensionTester
     //this sample use SimpleAggregator to implement
     {
       BeanPropertyValueGenerator<TestRecord, Integer> valueGenerator = new BeanPropertyValueGenerator<TestRecord, Integer>(TestRecord.class, "age", Integer.class);
-      PropertyCriteria<TestRecord, Integer> criteria = new PropertyCriteria<TestRecord, Integer>(valueGenerator, new EqualsMatcher<Integer, Integer>(9));
+      PropertyCriteria<TestRecord, Integer, Integer> criteria = new PropertyCriteria<TestRecord, Integer, Integer>(valueGenerator, new EqualsMatcher<Integer, Integer>(9));
       Aggregator aggregator = new SimpleAggregator("1", criteria, 
           new BeanPropertyValueGenerator(TestRecord.class, "salary", Double.class), new IncrementalAggregateSum(Double.class));
       chain.addAggregator(aggregator);
@@ -50,7 +50,7 @@ public class DimensionTester
       BeanPropertyValueGenerator<TestRecord, Long> timeGenerator = new BeanPropertyValueGenerator<>(TestRecord.class, "createdTime", Long.class);
       BeanPropertyValueGenerator<TestRecord, Integer> ageGenerator = new BeanPropertyValueGenerator<>(TestRecord.class, "age", Integer.class);
       AggregateFactory<? extends CloneableAggregate<?, Integer>, Integer> aggregateFactory = new AggregateCloneFactory<>(new IncrementalAggregateSum<Integer>(Integer.class));
-      DefaultFiexedTimeBucketsAggregator<TestRecord, Integer> aggregator = new DefaultFiexedTimeBucketsAggregator<>(timeGenerator, ageGenerator,
+      DefaultFiexedTimeBucketsAggregator<TestRecord, Integer, Integer> aggregator = new DefaultFiexedTimeBucketsAggregator<>(timeGenerator, ageGenerator,
           aggregateFactory );
       aggregator.setName("2");
       aggregator.setValueType(Integer.class);

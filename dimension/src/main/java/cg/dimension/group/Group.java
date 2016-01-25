@@ -10,7 +10,7 @@ package cg.dimension.group;
  *
  * @param <V>
  */
-public interface Group<B>
+public interface Group<B, K>
 {
   /**
    * put the bean into the group. return true if the bean belong to this group.
@@ -18,5 +18,11 @@ public interface Group<B>
    * @return
    */
   public boolean put(B bean);
+  
+  /**
+   * get the key of the group, the key can identify the group
+   * @return
+   */
+  public K getKey();
   
 }

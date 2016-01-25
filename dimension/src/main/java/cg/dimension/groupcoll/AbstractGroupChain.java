@@ -6,9 +6,9 @@ import com.google.common.collect.Lists;
 
 import cg.dimension.group.Group;
 
-public abstract class AbstractGroupChain<B> implements GroupCollection<B>
+public abstract class AbstractGroupChain<B, K> implements GroupCollection<B>
 {
-  protected Collection<Group<B>> groups;
+  protected Collection<Group<B, K>> groups;
   
   protected void initGroups()
   {
@@ -18,7 +18,7 @@ public abstract class AbstractGroupChain<B> implements GroupCollection<B>
   
   public boolean put(B bean)
   {
-    for(Group<B> group : groups)
+    for(Group<B, K> group : groups)
     {
       if(group.put(bean))
         return true;
@@ -26,7 +26,7 @@ public abstract class AbstractGroupChain<B> implements GroupCollection<B>
     return false;
   }
   
-  public Collection<Group<B>> getGroups()
+  public Collection<Group<B, K>> getGroups()
   {
     return groups;
   }

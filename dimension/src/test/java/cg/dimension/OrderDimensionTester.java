@@ -4,7 +4,6 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -20,9 +19,8 @@ import cg.dimension.group.DefaultGroupAggregate;
 import cg.dimension.group.Group;
 import cg.dimension.group.GroupAggregateByValueEqualsMatcher;
 import cg.dimension.group.SimpleGroupAggregate;
-import cg.dimension.group.TimeRangeGroupAggregate;
-import cg.dimension.groupcoll.GroupCollection;
-import cg.dimension.groupcoll.SimpleAutoGenerateGroupChain;
+import cg.dimension.groupcoll.MapAutoGenerateGroupCollection;
+import cg.dimension.groupcoll.SimpleMapAutoGenerateGroupCollection;
 import cg.dimension.handler.BeanAggregateHandler;
 import cg.dimension.model.aggregate.IncrementalAggregateSum;
 import cg.dimension.model.matcher.EqualsMatcher;
@@ -30,6 +28,7 @@ import cg.dimension.model.matcher.MatcherTimeRangeMapper;
 import cg.dimension.model.matcher.MatcherTimeRangeMapper.TimeRangePolicy;
 import cg.dimension.model.matcher.RangeMatcher;
 import cg.dimension.model.matcher.TypicalValueMatcherSpec;
+import cg.dimension.model.property.BeanMultiplePropertyValueGenerator;
 import cg.dimension.model.property.BeanPropertyValueGenerator;
 import cg.dimension.model.property.DefaultBeanMatcher;
 import cg.dimension.order.Country;
@@ -50,7 +49,7 @@ public class OrderDimensionTester
   private static final Logger logger = LoggerFactory.getLogger(OrderDimensionTester.class);
   private static final int SLEEP_TIME = 0;
   private static boolean wantVerify = true;
-  protected int COUNT = 100000;
+  protected int COUNT = 200000;
   
 
   @Test
@@ -68,7 +67,9 @@ public class OrderDimensionTester
     zipGroupAggregate.withAggregate(aggregateSum);
    
     
-    SimpleAutoGenerateGroupChain<OrderDetail> gc = new SimpleAutoGenerateGroupChain<OrderDetail>();
+    //SimpleAutoGenerateGroupChain<OrderDetail, String> gc = new SimpleAutoGenerateGroupChain<>();
+    SimpleMapAutoGenerateGroupCollection<OrderDetail, String> gc = new SimpleMapAutoGenerateGroupCollection<>();
+    gc.setValueGenerator(zipGenerator);
     gc.setTemplate(zipGroupAggregate);
     
     Map<String, Integer> expectZipToProductSum = Maps.newHashMap();
@@ -103,8 +104,8 @@ public class OrderDimensionTester
     if(wantVerify)
     {
       Map<String, Integer> actualProductToSum = Maps.newHashMap();
-      Collection<Group<OrderDetail>> groups = gc.getGroups();
-      for(Group<OrderDetail> group : groups)
+      Collection<Group<OrderDetail, String>> groups = gc.getGroups();
+      for(Group<OrderDetail, String> group : groups)
       {
         GroupAggregateByValueEqualsMatcher<OrderDetail, String, Integer> realGroup = (GroupAggregateByValueEqualsMatcher<OrderDetail, String, Integer>)group;
         
@@ -136,7 +137,9 @@ public class OrderDimensionTester
     BeanPropertyValueGenerator<OrderDetail, Integer> productSizeGenerator = new BeanPropertyValueGenerator<>(OrderDetail.class, "productSize", Integer.class);
     groupAggregate.withAggregatePropertyValueGenerator(productSizeGenerator);
     
-    SimpleAutoGenerateGroupChain<OrderDetail> groupChain = new SimpleAutoGenerateGroupChain<>();
+    //SimpleAutoGenerateGroupChain<OrderDetail, String> groupChain = new SimpleAutoGenerateGroupChain<>();
+    SimpleMapAutoGenerateGroupCollection<OrderDetail, String> groupChain = new SimpleMapAutoGenerateGroupCollection<>();
+    groupChain.setValueGenerator(zipGenerator);
     groupChain.setTemplate(groupAggregate);
     
     Map<String, Integer> expectZipToProductSum = Maps.newHashMap();
@@ -170,8 +173,8 @@ public class OrderDimensionTester
     {
       //verify
       Map<String, Integer> actualProductToSum = Maps.newHashMap();
-      Collection<Group<OrderDetail>> groups = groupChain.getGroups();
-      for(Group<OrderDetail> group : groups)
+      Collection<Group<OrderDetail, String>> groups = groupChain.getGroups();
+      for(Group<OrderDetail, String> group : groups)
       {
         @SuppressWarnings("unchecked")
         SimpleGroupAggregate<EqualsMatcher<String,String>, OrderDetail, String, Integer> realGroup = (SimpleGroupAggregate<EqualsMatcher<String,String>, OrderDetail, String, Integer>)group;
@@ -198,6 +201,7 @@ public class OrderDimensionTester
   }
   
   
+  
   @Test
   public void testSumOfProductsGroupByZipAndCountry()
   {
@@ -205,16 +209,20 @@ public class OrderDimensionTester
     beanMatcher.addMatcherInfo(OrderDetail.class, "customer.zip", String.class, new EqualsMatcher<String, String>());
     beanMatcher.addMatcherInfo(OrderDetail.class, "customer.country", Country.class, new EqualsMatcher<String, Country>());
 
-    DefaultBeanMatcherDynamicGroup<DefaultBeanMatcher<OrderDetail>, OrderDetail, Integer> countryZipGroup = new DefaultBeanMatcherDynamicGroup<>();
+    DefaultBeanMatcherDynamicGroup<DefaultBeanMatcher<OrderDetail>, OrderDetail, Integer, Map<String, ?>> countryZipGroup = new DefaultBeanMatcherDynamicGroup<>();
     BeanPropertyValueGenerator<OrderDetail, Integer> productSizeGenerator = new BeanPropertyValueGenerator<>(OrderDetail.class, "productSize", Integer.class);
     countryZipGroup.withBeanHandler(new BeanAggregateHandler<OrderDetail, Integer>()
                            .withAggregate(new IncrementalAggregateSum<Integer>())
                            .withAggregateValueGenerator(productSizeGenerator)).withMatchTemplate(beanMatcher);
-                           
-                           
     
-    
-    SimpleAutoGenerateGroupChain<OrderDetail> gc = new SimpleAutoGenerateGroupChain<OrderDetail>();
+    BeanPropertyValueGenerator<OrderDetail, Country> countryGenerator = new BeanPropertyValueGenerator<>(OrderDetail.class, "customer.country", Country.class);
+    BeanPropertyValueGenerator<OrderDetail, String> zipGenerator = new BeanPropertyValueGenerator<>(OrderDetail.class, "customer.zip", String.class);
+    BeanMultiplePropertyValueGenerator<OrderDetail> zipCountryValueGenerator = new BeanMultiplePropertyValueGenerator<OrderDetail>()
+                                                                     .addPropertyValueGenerator(countryGenerator)
+                                                                     .addPropertyValueGenerator(zipGenerator);
+//    SimpleAutoGenerateGroupChain<OrderDetail, Map<String, Object>> gc = new SimpleAutoGenerateGroupChain<>();
+    SimpleMapAutoGenerateGroupCollection<OrderDetail, Map<String, ?>> gc = new SimpleMapAutoGenerateGroupCollection<>();
+    gc.setValueGenerator(zipCountryValueGenerator);    
     gc.setTemplate(countryZipGroup);
     
     Map<String, Integer> expectCountryZipToProductSum = Maps.newHashMap();
@@ -251,21 +259,21 @@ public class OrderDimensionTester
     {
       //verify
       Map<String, Integer> actualProductToSum = Maps.newHashMap();
-      Collection<Group<OrderDetail>> groups = gc.getGroups();
-      for(Group<OrderDetail> group : groups)
+      Collection<Group<OrderDetail, Map<String, ?>>> groups = gc.getGroups();
+      for(Group<OrderDetail, Map<String, ?>> group : groups)
       {
-        DefaultBeanMatcherDynamicGroup<DefaultBeanMatcher<OrderDetail>, OrderDetail, Integer> realGroup = (DefaultBeanMatcherDynamicGroup<DefaultBeanMatcher<OrderDetail>, OrderDetail, Integer>)group;
+        DefaultBeanMatcherDynamicGroup<DefaultBeanMatcher<OrderDetail>, OrderDetail, Integer, Map<String, ?>> realGroup = (DefaultBeanMatcherDynamicGroup<DefaultBeanMatcher<OrderDetail>, OrderDetail, Integer, Map<String, ?>>)group;
         
         DefaultBeanMatcher<OrderDetail> matcher = (DefaultBeanMatcher<OrderDetail>)realGroup.getMatcher();
         
-        List<Pair<BeanPropertyValueGenerator<OrderDetail, Object>, TypicalValueMatcherSpec<?, Object, Object>>> matcherInfos = matcher.getMatcherInfos();
+        List<Pair<BeanPropertyValueGenerator<OrderDetail, Object>, TypicalValueMatcherSpec<?, Object, Object, Object>>> matcherInfos = matcher.getMatcherInfos();
         String country_zip = "";
         {
-          Pair<BeanPropertyValueGenerator<OrderDetail, Object>, TypicalValueMatcherSpec<?, Object, Object>> pair = matcherInfos.get(1);
+          Pair<BeanPropertyValueGenerator<OrderDetail, Object>, TypicalValueMatcherSpec<?, Object, Object, Object>> pair = matcherInfos.get(1);
           country_zip += ((EqualsMatcher)pair.getRight()).getExpectedValue();
         }
         {
-          Pair<BeanPropertyValueGenerator<OrderDetail, Object>, TypicalValueMatcherSpec<?, Object, Object>> pair = matcherInfos.get(0);
+          Pair<BeanPropertyValueGenerator<OrderDetail, Object>, TypicalValueMatcherSpec<?, Object, Object, Object>> pair = matcherInfos.get(0);
           country_zip += "_";
           country_zip += ((EqualsMatcher)pair.getRight()).getExpectedValue();
         }
@@ -286,13 +294,17 @@ public class OrderDimensionTester
     DefaultGroupAggregate<RangeMatcher<Long>, Range<Long>, OrderDetail, Long, Integer> groupAggregate = new DefaultGroupAggregate<>();
     groupAggregate.withAggregate(new IncrementalAggregateSum<Integer>());
     groupAggregate.withMatcherTemplate(new RangeMatcher<Long>());
-    groupAggregate.withMatcherValueMapper(new MatcherTimeRangeMapper().withTimeRangePolicy(TimeRangePolicy.PER_SECOND));
+    final MatcherTimeRangeMapper timeRangeMapper = new MatcherTimeRangeMapper().withTimeRangePolicy(TimeRangePolicy.PER_SECOND);
+    groupAggregate.withMatcherValueMapper(timeRangeMapper);
     BeanPropertyValueGenerator<OrderDetail, Long> timeGenerator = new BeanPropertyValueGenerator<>(OrderDetail.class, "orderInfo.orderTime", Long.class);
     groupAggregate.withMatchPropertyValueGenerator(timeGenerator);
     BeanPropertyValueGenerator<OrderDetail, Integer> productSizeGenerator = new BeanPropertyValueGenerator<>(OrderDetail.class, "productSize", Integer.class);
     groupAggregate.withAggregatePropertyValueGenerator(productSizeGenerator);
     
-    SimpleAutoGenerateGroupChain<OrderDetail> groupChain = new SimpleAutoGenerateGroupChain<>();
+//    SimpleAutoGenerateGroupChain<OrderDetail, Range<Long>> groupChain = new SimpleAutoGenerateGroupChain<>();
+    MapAutoGenerateGroupCollection<OrderDetail, Long, Range<Long>> groupChain = new MapAutoGenerateGroupCollection<>();
+    groupChain.setValueGenerator(timeGenerator);
+    groupChain.setMatcherValueMapper(timeRangeMapper);
     groupChain.setTemplate(groupAggregate);
     
     Map<Range<Long>, Integer> expectTimeRangeToProductSum = Maps.newHashMap();
@@ -331,8 +343,8 @@ public class OrderDimensionTester
     {
       //verify
       Map<Range<Long>, Integer> actualProductToSum = Maps.newHashMap();
-      Collection<Group<OrderDetail>> groups = groupChain.getGroups();
-      for(Group<OrderDetail> group : groups)
+      Collection<Group<OrderDetail, Range<Long>>> groups = groupChain.getGroups();
+      for(Group<OrderDetail, Range<Long>> group : groups)
       {
         @SuppressWarnings("unchecked")
         DefaultGroupAggregate<RangeMatcher<Long>, Range<Long>, OrderDetail, Long, Integer> realGroupAggregate = (DefaultGroupAggregate<RangeMatcher<Long>, Range<Long>, OrderDetail, Long, Integer>)group;

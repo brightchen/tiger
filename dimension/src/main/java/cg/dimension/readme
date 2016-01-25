@@ -19,4 +19,9 @@ dimension factors
     - values
     - aggregate
   
-  
+ 
+ branches
+   - dm-performance:
+     - the current performance is around 17s/100K for simple case.
+     - move Match value generator from Group to Group-Collection as all groups of collection-group share same match value generator,
+       and, locate the group directly by match value instead try one by one

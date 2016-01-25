@@ -12,9 +12,9 @@ import cg.dimension.group.GroupCloneFactory;
  *
  * @param <B>
  */
-public class SimpleAutoGenerateGroupChain<B> extends AbstractGroupChain<B>
+public class SimpleAutoGenerateGroupChain<B, K> extends AbstractGroupChain<B, K>
 {
-  protected GroupCloneFactory<B> groupFactory = new GroupCloneFactory<>();
+  protected GroupCloneFactory<B, K> groupFactory = new GroupCloneFactory<>();
   
   public SimpleAutoGenerateGroupChain()
   {
@@ -24,20 +24,20 @@ public class SimpleAutoGenerateGroupChain<B> extends AbstractGroupChain<B>
   @Override
   public boolean put(B bean)
   {
-    for(Group<B> group : groups)
+    for(Group<B, K> group : groups)
     {
       if(group.put(bean))
         return true;
     }
     
     //create a group for this bean
-    Group<B> group = groupFactory.createGroup();
+    Group<B, K> group = groupFactory.createGroup();
     group.put(bean);
     
     return groups.add(group);
   }
   
-  public void setTemplate(CloneableGroup<? extends Group<B>, B> template)
+  public void setTemplate(CloneableGroup<? extends Group<B, K>, B, K> template)
   {
     groupFactory.setTemplate(template);
   }

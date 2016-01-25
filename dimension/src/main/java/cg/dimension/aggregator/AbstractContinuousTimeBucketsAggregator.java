@@ -6,6 +6,7 @@ import java.util.Set;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import cg.common.generate.Range;
 import cg.dimension.model.aggregate.Aggregate;
 import cg.dimension.model.aggregate.AggregateType;
 import cg.dimension.model.aggregate.IncrementalAggregateSum;
@@ -22,13 +23,13 @@ import cg.dimension.model.property.BeanPropertyValueGenerator;
  * @param <MV>
  * @param <AV>
  */
-public abstract class AbstractContinuousTimeBucketsAggregator<B, MV, AV extends Number> implements AssembleAggregator<B, MV, AV>
+public abstract class AbstractContinuousTimeBucketsAggregator<B, MV, AV extends Number> implements AssembleAggregator<B, MV, AV, Range<Long>>
 {
-  protected Map<String, Aggregator<B, ?, ? extends Number>> aggregatorMap = Maps.newHashMap();
+  protected Map<String, Aggregator<B, ?, ? extends Number, ?>> aggregatorMap = Maps.newHashMap();
   protected Aggregate<AV>[] aggregaes;
   
   //use this structure the share the criteria and BeanPropertyValueGenerator to avoid duplicate computation
-  protected Map<PropertyCriteria<B, Object>, Set<BeanPropertyValueGenerator<B, Object>>> criteriaToMatchValueGenerator = Maps.newHashMap();
+  protected Map<PropertyCriteria<B, Object, Range<Long>>, Set<BeanPropertyValueGenerator<B, Object>>> criteriaToMatchValueGenerator = Maps.newHashMap();
   protected Map<BeanPropertyValueGenerator<B, Number>, Set<Aggregate<Number>>> aggregateValueGeneratorToAggregate = Maps.newHashMap();
   
 
@@ -40,7 +41,7 @@ public abstract class AbstractContinuousTimeBucketsAggregator<B, MV, AV extends 
    * @param aggregateType
    * @return Aggregator in order to get value.
    */
-  public <MV, AV extends Number> Aggregator<B, MV, AV> addAggregator(String name, PropertyCriteria<B, MV> criteria, 
+  public <MV, AV extends Number, K> Aggregator<B, MV, AV, K> addAggregator(String name, PropertyCriteria<B, MV, K> criteria, 
       BeanPropertyValueGenerator<B, MV> matchValueGenerator, 
       BeanPropertyValueGenerator<B, AV> aggregateValueGenerator,
       Class<AV> aggregateValueType, AggregateType aggregateType)
@@ -53,7 +54,7 @@ public abstract class AbstractContinuousTimeBucketsAggregator<B, MV, AV extends 
     
     if(criteriaToMatchValueGenerator.get(criteria) == null)
     {
-      criteriaToMatchValueGenerator.put((PropertyCriteria<B, Object>)criteria, Sets.<BeanPropertyValueGenerator<B, Object>>newHashSet());
+      criteriaToMatchValueGenerator.put((PropertyCriteria<B, Object, Range<Long>>)criteria, Sets.<BeanPropertyValueGenerator<B, Object>>newHashSet());
     }
     criteriaToMatchValueGenerator.get(criteria).add((BeanPropertyValueGenerator<B, Object>)matchValueGenerator);
     
@@ -67,13 +68,13 @@ public abstract class AbstractContinuousTimeBucketsAggregator<B, MV, AV extends 
     return aggregator;
   }
   
-  public void addAggregator(AssembleAggregator<B, Object, Number> aggregator)
+  public void addAggregator(AssembleAggregator<B, Object, Number, Range<Long>> aggregator)
   {
     if(aggregatorMap.get(aggregator.getName()) != null)
       throw new IllegalArgumentException("The aggregate name '" + aggregator.getName() + "' already used.");
     aggregatorMap.put(aggregator.getName(), aggregator);
     
-    PropertyCriteria<B, Object> criteria = aggregator.getCriteria();
+    PropertyCriteria<B, Object, Range<Long>> criteria = aggregator.getCriteria();
     if(criteriaToMatchValueGenerator.get(criteria) == null)
     {
       criteriaToMatchValueGenerator.put(criteria, Sets.<BeanPropertyValueGenerator<B, Object>>newHashSet());
@@ -92,7 +93,7 @@ public abstract class AbstractContinuousTimeBucketsAggregator<B, MV, AV extends 
   @Override
   public void processBean(B bean)
   {
-    for(Map.Entry<PropertyCriteria<B, Object>, Set<BeanPropertyValueGenerator<B, Object>>> criteriaEntry : criteriaToMatchValueGenerator.entrySet())
+    for(Map.Entry<PropertyCriteria<B, Object, Range<Long>>, Set<BeanPropertyValueGenerator<B, Object>>> criteriaEntry : criteriaToMatchValueGenerator.entrySet())
     {
       if(!criteriaEntry.getKey().matches(bean))
         continue;

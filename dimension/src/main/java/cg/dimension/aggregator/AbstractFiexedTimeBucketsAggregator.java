@@ -17,7 +17,7 @@ import cg.dimension.model.property.BeanPropertyValueGenerator;
  * @param <B>
  * @param <AV>
  */
-public abstract class AbstractFiexedTimeBucketsAggregator<B, MV, AV extends Number> extends CompositeAggregator<B, MV, AV>
+public abstract class AbstractFiexedTimeBucketsAggregator<B, MV, AV extends Number, K> extends CompositeAggregator<B, MV, AV, K>
 {
   public static final int DEFAULT_SLIDE_STEP = 1000;  //default is 1 second
   protected String name;
@@ -105,7 +105,7 @@ public abstract class AbstractFiexedTimeBucketsAggregator<B, MV, AV extends Numb
     }
     
     //let the sub aggregator handle this bean
-    for(Aggregator<B, MV, AV> subAggregator : subAggregators)
+    for(Aggregator<B, MV, AV, Object> subAggregator : subAggregators)
     {
       subAggregator.processBean(bean);
     }
