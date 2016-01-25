@@ -14,25 +14,25 @@ import cg.dimension.aggregator.Aggregator;
  */
 public abstract class AbstractAggregatorChain<B> implements AggregatorCollection<B>
 {
-  protected Map<String, Aggregator<B, ?, ? extends Number>> nameToAggregator = Maps.newHashMap();
+  protected Map<String, Aggregator<B, ?, ? extends Number, ?>> nameToAggregator = Maps.newHashMap();
   
   public AbstractAggregatorChain(){}
   
   @SuppressWarnings("unchecked")
-  public AbstractAggregatorChain(Aggregator<B, Object, Number> ... aggregators)
+  public AbstractAggregatorChain(Aggregator<B, Object, Number, Object> ... aggregators)
   {
     addAggregators(aggregators);
   }
   
-  public void addAggregator(Aggregator<B, ?, ? extends Number> aggregator)
+  public void addAggregator(Aggregator<B, ?, ? extends Number, ?> aggregator)
   {
     nameToAggregator.put(aggregator.getName(), aggregator);
   }
   
   @SuppressWarnings("unchecked") 
-  public void addAggregators(Aggregator<B, Object, Number> ... aggregators)
+  public void addAggregators(Aggregator<B, Object, Number, Object> ... aggregators)
   {
-    for(Aggregator<B, Object, Number> aggregator : aggregators)
+    for(Aggregator<B, Object, Number, Object> aggregator : aggregators)
       nameToAggregator.put(aggregator.getName(), aggregator);
   }
 

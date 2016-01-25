@@ -8,8 +8,8 @@ package cg.dimension.model.matcher;
  * @author bright
  *
  */
-public interface TypicalValueMatcherSpec<T extends TypicalValueMatcherSpec<T, EV, V>, EV, V> 
-    extends CloneableMatcher<T, V>
+public interface TypicalValueMatcherSpec<T extends TypicalValueMatcherSpec<T, EV, V, K>, EV, V, K> 
+    extends CloneableMatcher<T, V, K>
 {
   public void injectExpectValue(EV value);
 }

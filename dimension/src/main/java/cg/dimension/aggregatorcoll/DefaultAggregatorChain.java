@@ -9,7 +9,7 @@ public class DefaultAggregatorChain<B> extends AbstractAggregatorChain<B>
   @Override
   public void processBean(B bean)
   {
-    for(Map.Entry<String, Aggregator<B, ?, ? extends Number>> entry : nameToAggregator.entrySet())
+    for(Map.Entry<String, Aggregator<B, ?, ? extends Number, ?>> entry : nameToAggregator.entrySet())
     {
       entry.getValue().processBean(bean);
     }

@@ -18,13 +18,13 @@ import cg.dimension.model.matcher.TypicalValueMatcherSpec;
  * @param <MV>
  * @param <AV>
  */
-public class DefaultGroupAggregate<M extends TypicalValueMatcherSpec<M, EV, MV>, EV, B, MV, AV extends Number> 
-    extends AbstractValueMatcherDynamicGroupAggregate<DefaultGroupAggregate<M, EV, B, MV, AV>, B, MV, AV>
+public class DefaultGroupAggregate<M extends TypicalValueMatcherSpec<M, EV, MV, EV>, EV, B, MV, AV extends Number> 
+    extends AbstractValueMatcherDynamicGroupAggregate<DefaultGroupAggregate<M, EV, B, MV, AV>, B, MV, AV, EV>
 {
-  protected TypicalValueMatcherSpec<M, EV, MV> matcherTemplate;
+  protected TypicalValueMatcherSpec<M, EV, MV, EV> matcherTemplate;
   protected MatcherValueMapper<MV, EV> matcherValueMapper;
   
-  public DefaultGroupAggregate<M, EV, B, MV, AV> withMatcherTemplate(TypicalValueMatcherSpec<M, EV, MV> matcherTemplate)
+  public DefaultGroupAggregate<M, EV, B, MV, AV> withMatcherTemplate(TypicalValueMatcherSpec<M, EV, MV, EV> matcherTemplate)
   {
     this.matcherTemplate = matcherTemplate;
     return this;
@@ -77,5 +77,11 @@ public class DefaultGroupAggregate<M extends TypicalValueMatcherSpec<M, EV, MV>,
   protected EV getExpectedValue(MV value)
   {
     return matcherValueMapper.getExpectValue(value);
+  }
+
+  @Override
+  public EV getKey()
+  {
+    return matcher.getKey();
   }
 }

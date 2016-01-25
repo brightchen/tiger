@@ -14,26 +14,27 @@ import cg.dimension.model.property.BeanPropertyValueGenerator;
  * @param <MV>
  * @param <AV>
  */
-public abstract class AbstractValueMatcherDynamicGroupAggregate<T extends CloneableBean<T>, B, MV, AV extends Number> extends AbstractValueMatcherDynamicGroup<T, B, MV>
+public abstract class AbstractValueMatcherDynamicGroupAggregate<T extends CloneableBean<T>, B, MV, AV extends Number, K> 
+    extends AbstractValueMatcherDynamicGroup<T, B, MV, K>
 {
   protected BeanPropertyValueGenerator<B, AV> aggregatePropertyValueGenerator;
   protected Aggregate<AV> aggregate;
   
   public AbstractValueMatcherDynamicGroupAggregate(){}
   
-  public AbstractValueMatcherDynamicGroupAggregate<T, B, MV, AV> withMatchPropertyValueGenerator(BeanPropertyValueGenerator<B, MV> matchPropertyValueGenerator)
+  public AbstractValueMatcherDynamicGroupAggregate<T, B, MV, AV, K> withMatchPropertyValueGenerator(BeanPropertyValueGenerator<B, MV> matchPropertyValueGenerator)
   {
     this.setMatchPropertyValueGenerator(matchPropertyValueGenerator);
     return this;
   }
   
-  public AbstractValueMatcherDynamicGroupAggregate<T, B, MV, AV> withAggregatePropertyValueGenerator(BeanPropertyValueGenerator<B, AV> aggregatePropertyValueGenerator)
+  public AbstractValueMatcherDynamicGroupAggregate<T, B, MV, AV, K> withAggregatePropertyValueGenerator(BeanPropertyValueGenerator<B, AV> aggregatePropertyValueGenerator)
   {
     this.setAggregatePropertyValueGenerator(aggregatePropertyValueGenerator);
     return this;
   }
   
-  public AbstractValueMatcherDynamicGroupAggregate<T, B, MV, AV> withAggregate(Aggregate<AV> aggregate)
+  public AbstractValueMatcherDynamicGroupAggregate<T, B, MV, AV, K> withAggregate(Aggregate<AV> aggregate)
   {
     this.setAggregate(aggregate);
     return  this;

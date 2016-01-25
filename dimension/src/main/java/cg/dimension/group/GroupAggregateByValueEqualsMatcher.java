@@ -5,8 +5,9 @@ import cg.dimension.model.aggregate.Aggregate;
 import cg.dimension.model.aggregate.CloneableAggregate;
 import cg.dimension.model.matcher.EqualsMatcher;
 
-public class GroupAggregateByValueEqualsMatcher<B, MV, AV extends Number> extends AbstractValueMatcherDynamicGroupAggregate<GroupAggregateByValueEqualsMatcher<B, MV, AV>, B, MV, AV> 
-  implements CloneableBean<GroupAggregateByValueEqualsMatcher<B, MV, AV>>
+public class GroupAggregateByValueEqualsMatcher<B, MV, AV extends Number> 
+    extends AbstractValueMatcherDynamicGroupAggregate<GroupAggregateByValueEqualsMatcher<B, MV, AV>, B, MV, AV, MV> 
+    implements CloneableBean<GroupAggregateByValueEqualsMatcher<B, MV, AV>>
 {
   public static <B, MV, AV extends Number> GroupAggregateByValueEqualsMatcher<B, MV, AV> create()
   {
@@ -30,6 +31,12 @@ public class GroupAggregateByValueEqualsMatcher<B, MV, AV extends Number> extend
       clone.withAggregate((Aggregate)((CloneableAggregate)aggregate).cloneMe());
     }
     return clone;
+  }
+
+  @Override
+  public MV getKey()
+  {
+    return matcher.getKey();
   }
 
 }

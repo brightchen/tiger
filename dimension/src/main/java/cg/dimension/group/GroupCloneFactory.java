@@ -1,28 +1,28 @@
 package cg.dimension.group;
 
-public class GroupCloneFactory<B> implements GroupFactory<B>
+public class GroupCloneFactory<B, K> implements GroupFactory<B, K>
 {
-  protected CloneableGroup<? extends Group<B>, B> template;
+  protected CloneableGroup<? extends Group<B, K>, B, K> template;
   
   public GroupCloneFactory(){};
   
-  public GroupCloneFactory(CloneableGroup<? extends Group<B>, B> template)
+  public GroupCloneFactory(CloneableGroup<? extends Group<B, K>, B, K> template)
   {
     this.setTemplate(template);
   }
   
   @Override
-  public Group<B> createGroup()
+  public Group<B, K> createGroup()
   {
     return template.cloneMe();
   }
 
-  public CloneableGroup<? extends Group<B>, B> getTemplate()
+  public CloneableGroup<? extends Group<B, K>, B, K> getTemplate()
   {
     return template;
   }
 
-  public void setTemplate(CloneableGroup<? extends Group<B>, B> template)
+  public void setTemplate(CloneableGroup<? extends Group<B, K>, B, K> template)
   {
     this.template = template;
   }

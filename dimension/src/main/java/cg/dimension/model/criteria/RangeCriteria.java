@@ -2,7 +2,7 @@ package cg.dimension.model.criteria;
 
 import cg.common.generate.Range;
 
-public class RangeCriteria<T> //implements Criteria<T>
+public class RangeCriteria<T extends Comparable<T>> //implements Criteria<T>
 {
   protected Range<T> range;
   

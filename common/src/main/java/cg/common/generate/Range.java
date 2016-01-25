@@ -1,6 +1,6 @@
 package cg.common.generate;
 
-public class Range<T>
+public class Range<T extends Comparable<T>>
 {
   public final T from;
   public final T to;
@@ -13,23 +13,32 @@ public class Range<T>
   
   public Range(T from, T to)
   {
+    if(from.compareTo(to) > 0)
+      throw new IllegalStateException("Invalid ragne, <from> should smaller than <to>");
     this.from = from;
     this.to = to;
   }
   
-  @SuppressWarnings({ "rawtypes", "unchecked" })
+  /**
+   * The range start from <from> inclusively and end with <to> exclusively
+   * @param value
+   * @return
+   */
   public boolean isInRange(T value)
   {
-    if(value instanceof Comparable)
-    {
-      int result = ((Comparable)value).compareTo(from);
-      if(result == 0)
-        return true;
-      return (Math.signum(result) != Math.signum(((Comparable)value).compareTo(to)) );
-    }
-    throw new IllegalStateException("The range is not comparable");
+    int resultFrom = value.compareTo(from);
+    if (resultFrom < 0)
+      return false;
+    if (resultFrom == 0)
+      return true;
+    return value.compareTo(to) < 0;
   }
 
+  public void setValue(T from, T to)
+  {
+    
+  }
+  
   @Override
   public int hashCode()
   {
@@ -63,6 +72,11 @@ public class Range<T>
       return false;
     return true;
   }
-  
+
+  @Override
+  public String toString()
+  {
+    return "Range[" + from + ", " + to + "]";
+  }
   
 }

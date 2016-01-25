@@ -33,12 +33,12 @@ public class BeanPropertiesValueGenerator<T extends PropertyInfo>
   {
   }
 
-  @SuppressWarnings("unchecked")
-  public static <T extends PropertyInfo> BeanPropertiesValueGenerator<T> getPropertyValueGenerator(final Class<?> clazz,
-      List<T> propertyInfos)
-  {
-    return new BeanPropertiesValueGenerator<T>(clazz, propertyInfos);
-  }
+//  @SuppressWarnings("unchecked")
+//  public static <T extends PropertyInfo> BeanPropertiesValueGenerator<T> getPropertyValueGenerator(final Class<?> clazz,
+//      List<T> propertyInfos)
+//  {
+//    return new BeanPropertiesValueGenerator<T>(clazz, propertyInfos);
+//  }
 
   protected BeanPropertiesValueGenerator(final Class<?> clazz, List<T> propertiesInfo)
   {

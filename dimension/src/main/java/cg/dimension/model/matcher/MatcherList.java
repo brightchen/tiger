@@ -5,17 +5,17 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-public class MatcherList<V>
+public class MatcherList<V, K>
 {
-  protected List<Matcher<V>> matchers;
+  protected List<Matcher<V, K>> matchers;
 
   @SuppressWarnings("unchecked")
-  public void setMatchers(Matcher<V> ... matchers)
+  public void setMatchers(Matcher<V, K> ... matchers)
   {
     this.matchers = Lists.newArrayList(matchers);
   }
   
-  public void addMatcher(Matcher<V> matcher)
+  public void addMatcher(Matcher<V, K> matcher)
   {
     if(matcher == null)
       return;
@@ -25,7 +25,7 @@ public class MatcherList<V>
   }
   
   @SuppressWarnings("unchecked")
-  public void addMatchers(Matcher<V> ... matchers)
+  public void addMatchers(Matcher<V, K> ... matchers)
   {
     if(matchers == null)
       return;
@@ -35,7 +35,7 @@ public class MatcherList<V>
       this.matchers.add(matcher);
   }
   
-  public void addMatchers(Collection<Matcher<V>> matchers)
+  public void addMatchers(Collection<Matcher<V, K>> matchers)
   {
     if(matchers == null)
       return;

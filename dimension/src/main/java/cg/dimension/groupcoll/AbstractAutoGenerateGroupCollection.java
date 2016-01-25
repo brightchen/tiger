@@ -1,8 +1,11 @@
 package cg.dimension.groupcoll;
 
+import java.util.Collection;
+
 import cg.dimension.group.CloneableGroup;
 import cg.dimension.group.Group;
 import cg.dimension.group.GroupCloneFactory;
+import cg.dimension.model.ValueGenerator;
 
 /**
  * The AbstractAutoGenerateGroupCollection automatically generate groups by group factory.
@@ -12,31 +15,31 @@ import cg.dimension.group.GroupCloneFactory;
  *
  * @param <B>
  */
-public abstract class AbstractAutoGenerateGroupCollection<B> implements GroupCollection<B>
+public abstract class AbstractAutoGenerateGroupCollection<B, MV, K> implements GroupCollection<B>
 {
-  protected GroupCloneFactory<B> groupFactory = new GroupCloneFactory<>();
+  protected ValueGenerator<B, MV> matchValueGenerator;
+  protected GroupCloneFactory<B, K> groupFactory = new GroupCloneFactory<>();
   
-  @Override
-  public boolean put(B bean)
-  {
-    if(putToExistingGroups(bean))
-      return true;
-    
-    //create a group for this bean
-    Group<B> group = groupFactory.createGroup();
-    group.put(bean);
-    
-    return true;
-  }
+  public abstract Collection<Group<B, K>> getGroups();
   
-  /**
-   * @param bean
-   * @return true if successful put to existing groups, else return false
-   */
-  protected abstract boolean putToExistingGroups(B bean);
-  
-  public void setTemplate(CloneableGroup<? extends Group<B>, B> template)
+  public void setTemplate(CloneableGroup<? extends Group<B, K>, B, K> template)
   {
     groupFactory.setTemplate(template);
   }
+
+  public ValueGenerator<B, MV> getMatchValueGenerator()
+  {
+    return matchValueGenerator;
+  }
+
+  public void setValueGenerator(ValueGenerator<B, MV> matchValueGenerator)
+  {
+    this.matchValueGenerator = matchValueGenerator;
+  }
+
+  public void setGroupFactory(GroupCloneFactory<B, K> groupFactory)
+  {
+    this.groupFactory = groupFactory;
+  }
+  
 }

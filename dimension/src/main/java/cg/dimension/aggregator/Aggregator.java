@@ -12,7 +12,7 @@ import cg.dimension.model.matcher.Matcher;
  * @param <B>
  * @param <V>
  */
-public interface Aggregator<B, MV, AV extends Number> extends Matcher<MV>, Aggregate<AV>
+public interface Aggregator<B, MV, AV extends Number, K> extends Matcher<MV, K>, Aggregate<AV>
 {
   /**
    * this assume the value already match the criteria.

@@ -1,5 +1,5 @@
 package cg.dimension.aggregator;
 
-public interface AssembleAggregator<B, MV, AV extends Number> extends Assemble<B, MV, AV>, Aggregator<B, MV, AV>
+public interface AssembleAggregator<B, MV, AV extends Number, K> extends Assemble<B, MV, AV, K>, Aggregator<B, MV, AV, K>
 {
 }

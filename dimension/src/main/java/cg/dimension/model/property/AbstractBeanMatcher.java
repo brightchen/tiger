@@ -13,19 +13,19 @@ import cg.dimension.model.matcher.TypicalValueMatcherSpec;
  * @author bright
  *
  */
-public abstract class AbstractBeanMatcher<T extends AbstractBeanMatcher<T, B>, B> 
-    implements TypicalValueMatcherSpec<T, B, B> 
+public abstract class AbstractBeanMatcher<T extends AbstractBeanMatcher<T, B, K>, B, K> 
+    implements TypicalValueMatcherSpec<T, B, B, K> 
 {
   //protected List<BeanMatcherInfo<Object>> matcherInfos;
-  protected List<Pair<BeanPropertyValueGenerator<B, Object>, TypicalValueMatcherSpec<?,Object,Object>>> matcherInfos = Lists.newArrayList();
+  protected List<Pair<BeanPropertyValueGenerator<B, Object>, TypicalValueMatcherSpec<?,Object,Object,Object>>> matcherInfos = Lists.newArrayList();
   
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  public <V> void addMatcherInfo(BeanPropertyValueGenerator<B, V> valueGenerator, Matcher<V> matcher)
+  public <V> void addMatcherInfo(BeanPropertyValueGenerator<B, V> valueGenerator, Matcher<V, ?> matcher)
   {
-    matcherInfos.add((Pair)new Pair<BeanPropertyValueGenerator<B, V>, Matcher<V>>(valueGenerator, matcher));
+    matcherInfos.add((Pair)new Pair<BeanPropertyValueGenerator<B, V>, Matcher<V,?>>(valueGenerator, matcher));
   }
   
-  public <V> void addMatcherInfo(Class<B> beanClass, String valueExpression, Class<V> valueType, Matcher<V> matcher)
+  public <V> void addMatcherInfo(Class<B> beanClass, String valueExpression, Class<V> valueType, Matcher<V,?> matcher)
   {
     addMatcherInfo(new BeanPropertyValueGenerator<B, V>(beanClass, valueExpression, valueType), matcher);
   }
@@ -33,7 +33,7 @@ public abstract class AbstractBeanMatcher<T extends AbstractBeanMatcher<T, B>, B
   @Override
   public boolean matches(B bean)
   {
-    for(Pair<BeanPropertyValueGenerator<B, Object>, TypicalValueMatcherSpec<?,Object,Object>> matcherInfo : matcherInfos)
+    for(Pair<BeanPropertyValueGenerator<B, Object>, TypicalValueMatcherSpec<?,Object,Object,Object>> matcherInfo : matcherInfos)
     {
       //use logic and
       if(!matches(bean, matcherInfo.getLeft(), matcherInfo.getRight()))
@@ -42,19 +42,19 @@ public abstract class AbstractBeanMatcher<T extends AbstractBeanMatcher<T, B>, B
     return true;
   }
 
-  protected boolean matches(B bean, BeanPropertyValueGenerator<B, Object> valueGenerator, Matcher<Object> valueMatcher)
+  protected boolean matches(B bean, BeanPropertyValueGenerator<B, Object> valueGenerator, Matcher<Object,Object> valueMatcher)
   {
     Object value = valueGenerator.getValue(bean);
     return valueMatcher.matches(value);
   }
 
-  public List<Pair<BeanPropertyValueGenerator<B, Object>, TypicalValueMatcherSpec<?, Object, Object>>> getMatcherInfos()
+  public List<Pair<BeanPropertyValueGenerator<B, Object>, TypicalValueMatcherSpec<?, Object, Object,Object>>> getMatcherInfos()
   {
     return matcherInfos;
   }
 
   public void setMatcherInfos(
-      List<Pair<BeanPropertyValueGenerator<B, Object>, TypicalValueMatcherSpec<?, Object, Object>>> matcherInfos)
+      List<Pair<BeanPropertyValueGenerator<B, Object>, TypicalValueMatcherSpec<?, Object, Object,Object>>> matcherInfos)
   {
     this.matcherInfos = matcherInfos;
   }

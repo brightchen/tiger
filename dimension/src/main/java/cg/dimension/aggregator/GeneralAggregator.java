@@ -12,23 +12,23 @@ import cg.dimension.model.property.BeanPropertyValueGenerator;
  * @param <MV> the type of the value used for match
  * @param <AV> the type of the value for aggregate
  */
-public class GeneralAggregator<B, MV, AV extends Number> implements AssembleAggregator<B, MV, AV>
+public class GeneralAggregator<B, MV, AV extends Number, K> implements AssembleAggregator<B, MV, AV, K>
 {
   protected String name;
-  protected PropertyCriteria<B, MV> criteria;
+  protected PropertyCriteria<B, MV, K> criteria;
   protected BeanPropertyValueGenerator<B, AV> aggregateValueGenerator;    //related to a property (bean/property)
   protected BeanPropertyValueGenerator<B, MV> matchValueGenerator;    //related to a property (bean/property)
   protected Aggregate<AV> aggregate;
   
   public GeneralAggregator(){}
   
-  public GeneralAggregator(String name, PropertyCriteria<B, MV> criteria, BeanPropertyValueGenerator<B, MV> matchValueGenerator, 
+  public GeneralAggregator(String name, PropertyCriteria<B, MV, K> criteria, BeanPropertyValueGenerator<B, MV> matchValueGenerator, 
       BeanPropertyValueGenerator<B, AV> aggregateValueGenerator, Aggregate<AV> aggregate)
   {
     init(name, criteria, matchValueGenerator, aggregateValueGenerator, aggregate);
   }
 
-  public void init(String name, PropertyCriteria<B, MV> criteria, BeanPropertyValueGenerator<B, MV> matchValueGenerator, 
+  public void init(String name, PropertyCriteria<B, MV, K> criteria, BeanPropertyValueGenerator<B, MV> matchValueGenerator, 
       BeanPropertyValueGenerator<B, AV> aggregateValueGenerator, Aggregate<AV> aggregate)
   {
     this.name = name;
@@ -66,18 +66,25 @@ public class GeneralAggregator<B, MV, AV extends Number> implements AssembleAggr
   }
   
   @Override
+  public K getKey()
+  {
+    return criteria.getMatcher().getKey();
+  }
+
+  
+  @Override
   public AV getValue()
   {
     return aggregate.getValue();
   }
   
 
-  public PropertyCriteria<B, MV> getCriteria()
+  public PropertyCriteria<B, MV, K> getCriteria()
   {
     return criteria;
   }
 
-  public void setCriteria(PropertyCriteria<B, MV> criteria)
+  public void setCriteria(PropertyCriteria<B, MV, K> criteria)
   {
     this.criteria = criteria;
   }
@@ -135,6 +142,7 @@ public class GeneralAggregator<B, MV, AV extends Number> implements AssembleAggr
   {
     return aggregateValueGenerator;
   }
+
 
   
 }

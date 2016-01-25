@@ -11,22 +11,22 @@ import cg.dimension.model.property.BeanPropertyValueGenerator;
  * @param <B>
  * @param <V> the type of value for match and aggregate
  */
-public class SimpleAggregator<B, V extends Number> implements AssembleAggregator<B, V, V>
+public class SimpleAggregator<B, V extends Number, K> implements AssembleAggregator<B, V, V, K>
 {
   protected String name;
-  protected PropertyCriteria<B, V> criteria;
+  protected PropertyCriteria<B, V, K> criteria;
   protected BeanPropertyValueGenerator<B, V> aggregateValueGenerator;    //related to a property (bean/property), for both match value and aggregate value
   protected Aggregate<V> aggregate;
   
   public SimpleAggregator(){}
   
-  public SimpleAggregator(String name, PropertyCriteria<B, V> criteria, 
+  public SimpleAggregator(String name, PropertyCriteria<B, V, K> criteria, 
       BeanPropertyValueGenerator<B, V> valueGenerator, Aggregate<V> aggregate)
   {
     init(name, criteria, valueGenerator, aggregate);
   }
 
-  public void init(String name, PropertyCriteria<B, V> criteria, BeanPropertyValueGenerator<B, V> valueGenerator, Aggregate<V> aggregate)
+  public void init(String name, PropertyCriteria<B, V, K> criteria, BeanPropertyValueGenerator<B, V> valueGenerator, Aggregate<V> aggregate)
   {
     this.name = name;
     this.setCriteria(criteria);
@@ -67,12 +67,12 @@ public class SimpleAggregator<B, V extends Number> implements AssembleAggregator
     return aggregate.getValue();
   }
   
-  public PropertyCriteria<B, V> getCriteria()
+  public PropertyCriteria<B, V, K> getCriteria()
   {
     return criteria;
   }
 
-  public void setCriteria(PropertyCriteria<B, V> criteria)
+  public void setCriteria(PropertyCriteria<B, V, K> criteria)
   {
     this.criteria = criteria;
   }
@@ -119,6 +119,12 @@ public class SimpleAggregator<B, V extends Number> implements AssembleAggregator
   public BeanPropertyValueGenerator<B, V> getAggregateValueGenerator()
   {
     return aggregateValueGenerator;
+  }
+
+  @Override
+  public K getKey()
+  {
+    return criteria.getMatcher().getKey();
   }
 
 }

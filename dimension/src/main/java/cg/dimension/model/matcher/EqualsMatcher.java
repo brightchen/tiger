@@ -1,6 +1,6 @@
 package cg.dimension.model.matcher;
 
-public class EqualsMatcher<EV, V> implements TypicalValueMatcherSpec<EqualsMatcher<EV, V>, EV, V>
+public class EqualsMatcher<EV, V> implements TypicalValueMatcherSpec<EqualsMatcher<EV, V>, EV, V, EV>
 {
   protected EV expectedValue;
   
@@ -37,6 +37,12 @@ public class EqualsMatcher<EV, V> implements TypicalValueMatcherSpec<EqualsMatch
   public void injectExpectValue(EV value)
   {
     expectedValue = value;
+  }
+
+  @Override
+  public EV getKey()
+  {
+    return expectedValue;
   }
 
   

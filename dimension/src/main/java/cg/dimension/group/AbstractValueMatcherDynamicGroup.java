@@ -15,10 +15,11 @@ import cg.dimension.model.property.BeanPropertyValueGenerator;
  * @param <B>
  * @param <MV>
  */
-public abstract class AbstractValueMatcherDynamicGroup<T extends CloneableBean<T>, B, MV> implements CloneableGroup<T, B>
+public abstract class AbstractValueMatcherDynamicGroup<T extends CloneableBean<T>, B, MV, K> implements CloneableGroup<T, B, K>
 {
+  
+  protected Matcher<MV, K> matcher;
   protected BeanPropertyValueGenerator<B, MV> matchPropertyValueGenerator;
-  protected Matcher<MV> matcher;
   
   protected AbstractValueMatcherDynamicGroup(){}
   
@@ -57,12 +58,12 @@ public abstract class AbstractValueMatcherDynamicGroup<T extends CloneableBean<T
     this.matchPropertyValueGenerator = matchPropertyValueGenerator;
   }
 
-  public Matcher<MV> getMatcher()
+  public Matcher<MV, K> getMatcher()
   {
     return matcher;
   }
 
-  public void setMatcher(Matcher<MV> matcher)
+  public void setMatcher(Matcher<MV, K> matcher)
   {
     this.matcher = matcher;
   }

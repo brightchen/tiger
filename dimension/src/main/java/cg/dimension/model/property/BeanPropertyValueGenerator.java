@@ -16,6 +16,7 @@ import cg.dimension.model.ValueGenerator;
 public class BeanPropertyValueGenerator<B, V> implements ValueGenerator<B, V>
 {
   protected Getter<B, V> getter;
+  protected String propertyExpression;
   
   /**
    * this construct use the property type as the value type
@@ -31,18 +32,30 @@ public class BeanPropertyValueGenerator<B, V> implements ValueGenerator<B, V>
   public BeanPropertyValueGenerator(Class<B> beanClass, String propertyExpression, Class valueType)
   {
     getter = PojoUtils.createGetter(beanClass, propertyExpression, valueType);
+    this.setPropertyExpression(propertyExpression);
   }
   
   @SuppressWarnings("unchecked")
   public BeanPropertyValueGenerator(Class<B> beanClass, PropertyInfo propertyInfo)
   {
     getter = PojoUtils.createGetter(beanClass, propertyInfo.getPropertyExpression(), propertyInfo.getType().getJavaType());
+    this.setPropertyExpression(propertyInfo.getPropertyExpression());
   }
   
   @Override
   public V getValue(B bean)
   {
     return getter.get(bean);
+  }
+
+  public String getPropertyExpression()
+  {
+    return propertyExpression;
+  }
+
+  public void setPropertyExpression(String propertyExpression)
+  {
+    this.propertyExpression = propertyExpression;
   }
   
 }

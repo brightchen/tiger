@@ -3,14 +3,14 @@ package cg.dimension.group;
 import cg.dimension.model.matcher.Matcher;
 import cg.dimension.model.property.BeanPropertyValueGenerator;
 
-public abstract class AbstractPresetGroup<B, MV> implements Group<B>
+public abstract class AbstractPresetGroup<B, MV, K> implements Group<B, K>
 {
   protected BeanPropertyValueGenerator<B, MV> propertyValueGenerator;
-  protected Matcher<MV> matcher;
+  protected Matcher<MV, K> matcher;
   
   public AbstractPresetGroup(){}
   
-  public AbstractPresetGroup(BeanPropertyValueGenerator<B, MV> propertyValueGenerator, Matcher<MV> matcher)
+  public AbstractPresetGroup(BeanPropertyValueGenerator<B, MV> propertyValueGenerator, Matcher<MV, K> matcher)
   {
     this.setPropertyValueGenerator(propertyValueGenerator);
     this.setMatcher(matcher);
@@ -38,12 +38,12 @@ public abstract class AbstractPresetGroup<B, MV> implements Group<B>
     this.propertyValueGenerator = propertyValueGenerator;
   }
 
-  public Matcher<MV> getMatcher()
+  public Matcher<MV, K> getMatcher()
   {
     return matcher;
   }
 
-  public void setMatcher(Matcher<MV> matcher)
+  public void setMatcher(Matcher<MV, K> matcher)
   {
     this.matcher = matcher;
   }
