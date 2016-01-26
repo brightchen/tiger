@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import com.google.common.collect.Maps;
 
 import cg.common.general.Pair;
 import cg.common.generate.Range;
+import cg.common.generate.RepeatGenerator;
 import cg.dimension.group.DefaultBeanMatcherDynamicGroup;
 import cg.dimension.group.DefaultGroupAggregate;
 import cg.dimension.group.Group;
@@ -51,6 +53,16 @@ public class OrderDimensionTester
   private static boolean wantVerify = true;
   protected int COUNT = 200000;
   
+  RepeatGenerator<OrderDetail> generator;
+  
+  @Before
+  public void setUp()
+  {
+    generator = new RepeatGenerator<OrderDetail>()
+        .withEmbedGenerator(new OrderDetailGenerator())
+        .withBatchSize(100)
+        .withRepeatSize(2);
+  }
 
   @Test
   public void testSumOfProductsGroupByZip()
@@ -75,7 +87,7 @@ public class OrderDimensionTester
     Map<String, Integer> expectZipToProductSum = Maps.newHashMap();
     
     long beginTime = Calendar.getInstance().getTimeInMillis();
-    OrderDetailGenerator generator = new OrderDetailGenerator();
+    
     for(int i=0; i<COUNT; ++i)
     {
       OrderDetail od = generator.generate();
@@ -145,7 +157,6 @@ public class OrderDimensionTester
     Map<String, Integer> expectZipToProductSum = Maps.newHashMap();
     
     long beginTime = Calendar.getInstance().getTimeInMillis();
-    OrderDetailGenerator generator = new OrderDetailGenerator();
     for(int i=0; i<COUNT; ++i)
     {
       OrderDetail od = generator.generate();
@@ -228,7 +239,6 @@ public class OrderDimensionTester
     Map<String, Integer> expectCountryZipToProductSum = Maps.newHashMap();
     
     long beginTime = Calendar.getInstance().getTimeInMillis();
-    OrderDetailGenerator generator = new OrderDetailGenerator();
     for(int i=0; i<COUNT; ++i)
     {
       OrderDetail od = generator.generate();
