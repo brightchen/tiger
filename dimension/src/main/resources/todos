@@ -3,3 +3,13 @@
    for example, a sub interface matcher supports clone and setvalue. so create match can be implemented by a template matcher
  - The TimeBucketsAggregator should be a special case of group.
  - considering merge group with Aggregator.
+ 
+ - dm-performance:
+   - the previous version delegate the bean to the each specific group, and if group returns to true, we know this bean belongs to 
+     the specific group, if all groups are not fit, create a new group and let it handle this bean.
+   - the new version keep a map of matchValue (==> matchKey) ==> group. so when the bean come, get matchValue, (get match key )
+     and then find the group.
+     
+ - mem/performance
+   - when a new bean come, there are a lot of chance need to create a new group to handle it. the allocate memory is a pretty heavy
+     operation. try to an array of value ( instead of a list of object ) to keep the data 
